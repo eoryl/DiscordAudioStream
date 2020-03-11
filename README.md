@@ -7,8 +7,8 @@ It's initial purpose is to be used to play ambiant sound and music for virtual t
 # Compiling
 Compilation should without tinkering using visual studio 2019 with .Net desktop development workload. 
 Note some nugets and theire repsective dependencies are required :
-Discord.net https://github.com/discord-net/Discord.Net
-NAudio https://github.com/naudio/NAudio
+* Discord.net https://github.com/discord-net/Discord.Net
+* NAudio https://github.com/naudio/NAudio
 Visual studio should resolve all for you.
 After compilation add the dependencies dlls (32bit version) opus.dll and libsodium.dll in the bin/[profile] folder
 
