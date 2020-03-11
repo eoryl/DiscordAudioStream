@@ -142,11 +142,6 @@
     <Content Include="Licences\libopus.txt" />
     <Content Include="Licences\libsodium.txt" />
     <Content Include="Licences\NAudio.txt" />
-    <Content Include="Icons\sound-waves2_32.ico" />
-    <Content Include="Icons\sound-waves3_32.ico" />
-    <Content Include="Icons\sound-waves5_32.ico" />
-    <Content Include="Icons\streaming_32.ico" />
-    <None Include="Resources\IconCrossRed.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DiscordAudioStreamService\DiscordAudioStreamService.csproj">
