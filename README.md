@@ -6,7 +6,7 @@ It's initial purpose is to be used to play ambiant sound and music for virtual t
 
 # Compiling
 Compilation should work visual studio 2019. Note some nugets are required.
-After compilation add the dependencies dlls (32bit version) opus.dll and libsodium.dll in the bin/<profile> folder
+After compilation add the dependencies dlls (32bit version) opus.dll and libsodium.dll in the bin/[profile] folder
 
 # Setup
 * Install the virtual audio cable virtual audio card driver, avaialble at https://www.vb-audio.com/Cable/
