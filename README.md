@@ -5,8 +5,8 @@ A simple audio streaming tool for Discord based on Discord.net and NAudio to pla
 It's initial purpose is to be used to play ambiant sound and music for virtual table top sessions on Discord. 
 
 # Compiling
-Compilation should without tinkering using visual studio 2019 with .Net desktop development workload. 
-Note some nugets and theire repsective dependencies are required :
+Compilation should work without tinkering using visual studio 2019 with .Net desktop development workload. 
+Note some nugets and their repsective dependencies are required :
 * Discord.net https://github.com/discord-net/Discord.Net
 * NAudio https://github.com/naudio/NAudio
 
@@ -17,7 +17,7 @@ After compilation add the dependencies dlls (32bit version) opus.dll and libsodi
 # Setup
 * Get latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
 * Install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
-* Optionally set the virtual audio card is set to 48khz 16bit stereo in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced 
+* Optionally use 48khz audio in your playiut app and set the virtual audio card is set to 48khz 16bit stereo as well in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is to avoid unecessary resampling and dithering along the chain.
 * The audio is played by the selected audio applications through the virtual audio cable. Route either in the app itself or using Windows 10 routing interface in Settings > Sounds >  Advanced Sound Options > App volume and device preferences 
 * Get a discord bot token at https://discordapp.com/developers/applications 
 * Run DiscordAudioStream in File > Settings enter your bot token and exit
