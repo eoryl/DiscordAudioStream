@@ -15,6 +15,7 @@ Visual studio should resolve all for you.
 After compilation add the dependencies dlls (32bit version) opus.dll and libsodium.dll in the bin/[profile] folder
 
 # Setup
+* Get latest DiscordAudioStreamVersion here https://github.com/eoryl/DiscordAudioStream/releases
 * Install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
 * Optionally set the virtual audio card is set to 48khz 16bit stereo in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced 
 * The audio is played by the selected audio applications through the virtual audio cable. Route either in the app itself or using Windows 10 routing interface in Settings > Sounds >  Advanced Sound Options > App volume and device preferences 
