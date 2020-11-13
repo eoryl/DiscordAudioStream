@@ -16,7 +16,7 @@ After compilation add the dependencies dlls (32bit version) opus.dll and libsodi
 
 # Setup
 * Get latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
-* Install Visual C++ 2019 32bit redist from here https://www.itechtics.com/microsoft-visual-c-redistributable-versions-direct-download-links/#Microsoft_Visual_C_2019_Redistributable
+* Install Visual C++ 2019 x86 redist from here https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 * Install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
 * Optionally use 48khz audio in your playiut app and set the virtual audio card is set to 48khz 16bit stereo as well in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is to avoid unecessary resampling and dithering along the chain.
 * The audio is played by the selected audio applications through the virtual audio cable. Route either in the app itself or using Windows 10 routing interface in Settings > Sounds >  Advanced Sound Options > App volume and device preferences 
