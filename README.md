@@ -16,10 +16,12 @@ After compilation add the dependencies dlls (32bit version) opus.dll and libsodi
 
 # Setup
 * Get latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
+* Install Visual C++ 2019 32bit redist from here https://www.itechtics.com/microsoft-visual-c-redistributable-versions-direct-download-links/#Microsoft_Visual_C_2019_Redistributable
 * Install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
 * Optionally use 48khz audio in your playiut app and set the virtual audio card is set to 48khz 16bit stereo as well in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is to avoid unecessary resampling and dithering along the chain.
 * The audio is played by the selected audio applications through the virtual audio cable. Route either in the app itself or using Windows 10 routing interface in Settings > Sounds >  Advanced Sound Options > App volume and device preferences 
-* Get a discord bot token at https://discordapp.com/developers/applications 
+* Get a discord bot token at https://discordapp.com/developers/applications (you can find a better in depth tutorial here on how to create a bot https://docs.stillu.cc/guides/getting_started/first-bot.html)
+* Add the bot to your server https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=36701184&scope=bot I have tried to limit so necessary permissions only to do audio, just replace YOUR_BOT_ID_HERE with your actual bot client ID
 * Run DiscordAudioStream in File > Settings enter your bot token and exit
 * Run DiscordAudioStream again the application shoudl connect the status should go to green / idle and the bot connect to the voice channel
 * Select the virtual audio cable as a source, the server and the voice channel.
