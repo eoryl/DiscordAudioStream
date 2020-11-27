@@ -34,7 +34,11 @@ namespace DiscordAudioStream
                     new Action(
                             () =>
                             {
-                                if (statusStripMain != null) statusStripMain.Items["toolStripStatusLabelMessage"].Text = value;
+                                if (statusStripMain != null)
+                                {
+                                    if (statusStripMain.Items["toolStripStatusLabelMessage"].Text != value)
+                                        statusStripMain.Items["toolStripStatusLabelMessage"].Text = value;
+                                }
                             }
                             )
                     );
@@ -159,10 +163,10 @@ namespace DiscordAudioStream
                     new Action(
                             () =>
                             {
-                                if (value == StatusColourCode.Red) toolStripStatusIcon.Image = Properties.Resources.icon_cross;
-                                else if (value == StatusColourCode.Orange) toolStripStatusIcon.Image = Properties.Resources.icon_question_mark;
-                                else if (value == StatusColourCode.Green) toolStripStatusIcon.Image = Properties.Resources.icon_check_green;
-                                else if (value == StatusColourCode.Blue) toolStripStatusIcon.Image = Properties.Resources.icon_streaming;
+                                if ((value == StatusColourCode.Red) && (toolStripStatusIcon.Image != Properties.Resources.icon_cross))  toolStripStatusIcon.Image = Properties.Resources.icon_cross;
+                                else if ((value == StatusColourCode.Orange) && (toolStripStatusIcon.Image != Properties.Resources.icon_question_mark)) toolStripStatusIcon.Image = Properties.Resources.icon_question_mark;
+                                else if ((value == StatusColourCode.Green) && (toolStripStatusIcon.Image != Properties.Resources.icon_check_green)) toolStripStatusIcon.Image = Properties.Resources.icon_check_green;
+                                else if ((value == StatusColourCode.Blue) && (toolStripStatusIcon.Image != Properties.Resources.icon_streaming)) toolStripStatusIcon.Image = Properties.Resources.icon_streaming;
                             }
                             )
                     );
