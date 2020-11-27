@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiscordAudioStreamService
@@ -21,27 +22,33 @@ namespace DiscordAudioStreamService
 
         // discord 
         private DiscordSocketClient discordSocketClient = null;
-        private string discordBotKey;
+        private string discordBotToken;
         private string currentServerName = "";
         private string currentVoiceChannelName = "";
         private bool connected = false;
+        private bool disconnecting = false;
         private ConcurrentDictionary<string, ulong> serversUIDMap = new ConcurrentDictionary<string, ulong>();
         private ConcurrentDictionary<string, ulong> currentServerVoiceChannelsUIDMap = new ConcurrentDictionary<string, ulong>();
 
-        private SocketGuild currentServer = null;
-        private SocketVoiceChannel currentVoiceChannel = null;
         private AudioOutStream audioOutStream = null;
         private int audioBitrate;
         private AudioApplication audioContent;
         private int packetLoss;
+        private int streamingBufferDuration;
+        private byte[] audioTxBuffer;
 
         // audio 
         private WaveInEvent audioIn = null;
         private int captureBufferDuration;
         private string currentAudioDeviceName = "";
         private ConcurrentDictionary<string, int> audioDeviceNameToIDMap = new ConcurrentDictionary<string, int>();
-        private CircularBuffer circularBuffer;
-        private int circularBufferSize;
+        //private CircularBuffer circularBuffer;
+        //private int circularBufferSize;
+        private byte[] audioVisBuffer;
+
+        // 
+        private volatile uint lastAudioBufferSentID = 0;
+        private volatile uint currentAudioBufferID = 0;
 
         // views
         private IDiscordConnectionView _discordConnectionView;
@@ -50,28 +57,80 @@ namespace DiscordAudioStreamService
         //
         public AudioStreamingService() : this(null, null)
         {
-
         }
 
         public AudioStreamingService(IDiscordConnectionView discordConnectionView, IAudioCaptureView audioCaptureView)
         {
             // ask NAudio to send buffers by 40ms block
             captureBufferDuration = 40;
-            // N seconds of 48khz 16 bits stereo 
-            circularBufferSize = 4 * 48000 * 3;
+            streamingBufferDuration = 1000;
             // 96kbps (high quality) 
             // Opus supports bitrate from 6kbps to 510kbps
-            // Discord won't go aboev 128kbps
-            audioBitrate = 96000;
-            packetLoss = 30;
+            // Discord won't go above 128kbps for boosted servers only 96kbps for standard
+            audioBitrate = 96 * 1024;
+            packetLoss = 15;
             audioContent = AudioApplication.Music;
+            // allocate buffer large enough for 100ms at 48khz 16bits stereo 
+            audioTxBuffer = new byte[19200];
+            audioVisBuffer = new byte[19200];
+
             DiscordConnectionView = discordConnectionView;
             AudioCaptureView = audioCaptureView;
-            discordSocketClient = new DiscordSocketClient();
+            discordSocketClient = new DiscordSocketClient(
+                new DiscordSocketConfig { LogLevel = LogSeverity.Verbose }                
+                );
             discordSocketClient.Log += LogAsync;
             discordSocketClient.Connected += DiscordSocketClient_Connected;
             discordSocketClient.Disconnected += DiscordSocketClient_Disconnected;
             discordSocketClient.Ready += DiscordSocketClient_Ready;
+            discordSocketClient.LoggedIn += DiscordSocketClient_LoggedIn;
+            discordSocketClient.LoggedOut += DiscordSocketClient_LoggedOut;
+            discordSocketClient.VoiceServerUpdated += DiscordSocketClient_VoiceServerUpdated;
+            discordSocketClient.UserVoiceStateUpdated += DiscordSocketClient_UserVoiceStateUpdated;
+            
+            
+        }
+
+        private Task DiscordSocketClient_UserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3)
+        {
+            if ((arg2.VoiceChannel == null ) && (arg3.VoiceChannel != null))
+                Log("User " + arg1 + " connected  to voice channel " + arg3.VoiceChannel.Name);
+            else if ((arg2.VoiceChannel != null) && (arg3.VoiceChannel == null))
+                Log("User " + arg1 + " left voice channel " + arg2.VoiceChannel.Name);
+            else
+                Log("User " + arg1 + " voice state updated");
+
+            return Task.CompletedTask;
+        }
+
+        private Task DiscordSocketClient_VoiceServerUpdated(SocketVoiceServer arg)
+        {
+            Log("Voice server updated " + arg?.Guild.Value?.Name ) ;
+            return Task.CompletedTask;
+        }
+
+        private Task DiscordSocketClient_LoggedOut()
+        {
+            Log("Logged out");
+
+            if (DiscordConnectionView != null)
+            {
+                DiscordConnectionView.Status = "Logged out";
+                DiscordConnectionView.StatusColour = StatusColourCode.Red;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task DiscordSocketClient_LoggedIn()
+        {
+            Log("Logged in");
+            if (DiscordConnectionView != null)
+            {
+                DiscordConnectionView.Status = "Logged in";
+                DiscordConnectionView.StatusColour = StatusColourCode.Green;
+            }
+            return Task.CompletedTask;
         }
 
         public void Initialize()
@@ -131,8 +190,7 @@ namespace DiscordAudioStreamService
 
         public bool Connected { get => connected; set => connected = value; }
         public int CaptureBufferDuration { get => captureBufferDuration; set => captureBufferDuration = value; }
-        public string DiscordBotKey { get => discordBotKey; set => discordBotKey = value; }
-        public int CircularBufferSize { get => circularBufferSize; set => circularBufferSize = value; }
+        public string DiscordBotToken { get => discordBotToken; set => discordBotToken = value; }
         public int AudioBitrate { get => audioBitrate; set => audioBitrate = value; }
         public string AudioContent 
         { get 
@@ -150,11 +208,116 @@ namespace DiscordAudioStreamService
         }
 
         public int PacketLoss { get => packetLoss; set => packetLoss = value; }
+        public int StreamingBufferDuration { get => streamingBufferDuration; set => streamingBufferDuration = value; }
 
         private void DiscordConnectionView_CurrentVoiceChannelChanged(object sender, string newVoiceChannel)
         {
             ChangeVoiceChannel(newVoiceChannel);
         }
+
+        public async void ConnectVoiceChannel(string newVoiceChannel)
+        {
+            if (currentServerVoiceChannelsUIDMap.ContainsKey(newVoiceChannel))
+            {
+                try
+                {
+                    currentVoiceChannelName = newVoiceChannel;
+                    if (currentVoiceChannel != null)
+                        await currentVoiceChannel.ConnectAsync();
+                    Log("Stream created for " + newVoiceChannel);
+                }
+                catch (Exception e)
+                {
+                    Log("Exception raised while joining channel " + e.Message);
+                }
+            }
+
+            //IAudioClient audioClient;
+
+            if (currentServer != null)
+            {
+                if (currentServer.AudioClient != null)
+                {
+                    //audioClient = currentServer.AudioClient;
+                    var stream = currentServer.AudioClient.CreatePCMStream(audioContent, audioBitrate, streamingBufferDuration, packetLoss);
+                    //var stream = client.CreatePCMStream(AudioApplication.Voice ,128000 );
+                    if (stream == null)
+                    {
+                        Log("Unable to create output stream");
+                        return;
+                    }
+
+                    currentServer.AudioClient.Connected += AudioClient_Connected;
+                    currentServer.AudioClient.Disconnected += AudioClient_Disconnected;
+                    audioOutStream = (AudioOutStream)stream;
+                }
+                else
+                {
+                    Log("Audioclient not connected");
+                }
+                currentVoiceChannelName = newVoiceChannel;
+            }
+        }
+
+        public void DisconnectVoiceChannel()
+        {
+            disconnecting = true;
+            if (currentVoiceChannel != null)
+            {
+                if (audioOutStream != null)
+                {
+                    lock (audioOutStream)
+                    {
+                        try
+                        {
+                            //audioOutStream.ClearAsync(new System.Threading.CancellationToken()).GetAwaiter().GetResult();
+                            audioOutStream.Dispose();
+                            audioOutStream = null;
+                        }
+                        catch (Exception disEx)
+                        {
+                            Log("Exception raised disposing stream " + disEx.Message);
+                        }
+                    }
+                }
+                try
+                {
+                     currentVoiceChannel.DisconnectAsync();
+                }
+                catch (Exception e)
+                {
+                    Log("Exception raised while leaving channel " + e.Message);
+                }
+            }
+
+            if (DiscordConnectionView != null)
+            {
+                DiscordConnectionView.Status = "Idle";
+                DiscordConnectionView.StatusColour = StatusColourCode.Green;
+            }
+            disconnecting = false;
+
+        }
+
+        private SocketGuild currentServer
+        {
+            get
+            {
+                if (!serversUIDMap.ContainsKey( currentServerName)) return null;
+                return this.discordSocketClient.GetGuild(serversUIDMap[currentServerName]) ;
+            }
+        }
+
+        private SocketVoiceChannel currentVoiceChannel
+        {
+            get
+            {
+                if (currentServer == null) return null;
+                if (!currentServerVoiceChannelsUIDMap.ContainsKey(currentVoiceChannelName)) return null;
+                return currentServer.GetVoiceChannel(currentServerVoiceChannelsUIDMap[currentVoiceChannelName]); ;
+            }
+        }
+
 
         public async void ChangeVoiceChannel(string newVoiceChannel)
         {
@@ -164,56 +327,86 @@ namespace DiscordAudioStreamService
             if (newVoiceChannel == currentVoiceChannelName)
                 return;
 
-            if (DiscordConnectionView != null)
-                DiscordConnectionView.Status = "Idle";
+            DisconnectVoiceChannel();
+            ConnectVoiceChannel(newVoiceChannel);
+        }
 
-
-            if (currentVoiceChannel != null)
+        public async void ReconnectVoiceChannel()
+        {
+            if ((currentVoiceChannelName != "") && (currentServerName != "") )
             {
-                if (audioOutStream != null)
-                {
-                    lock (audioOutStream)
-                    {
-                        //audioOutStream.ClearAsync(new System.Threading.CancellationToken()).GetAwaiter().GetResult();
-                        audioOutStream.Dispose();
-                        audioOutStream = null;
-                    }
-                }
+                Log("Attempting reconnection to " + currentServerName + " / " + currentVoiceChannelName);
+                DisconnectVoiceChannel();
+                ConnectVoiceChannel(currentVoiceChannelName);
+                //Log("Reconnected to " + currentServerName + " / " + currentVoiceChannelName);
+            }
+        }
+
+        private Task AudioClient_Connected()
+        {
+            Log("Audioclient connected");
+            return Task.CompletedTask;
+        }
+
+        private Task AudioClient_Disconnected(Exception arg)
+        {
+            if (arg != null)
+            {
+                Log("Audioclient disconnected with exception: " + arg.Message);
+
                 try
-                { 
-                    await currentVoiceChannel.DisconnectAsync();
+                {
+                    if (!disconnecting)
+                    {
+                        Log("Testing for voice channel reconnection in 3 seconds");
+                        Task.Run(action: async () =>
+                        {
+                            await Task.Delay(3000);
+                            if (Connected)
+                            {
+                                if (currentServer != null)
+                                {
+                                    if (currentServer.AudioClient != null)
+                                    {
+                                        if (
+                                        (currentServer.AudioClient.ConnectionState != ConnectionState.Connected) ||
+                                        (currentServer.AudioClient.ConnectionState != ConnectionState.Connecting)
+                                        )
+                                        { 
+                                            ReconnectVoiceChannel();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    //else
+                    //{
+                    //    DisconnectVoiceChannel();
+                    //}
+
+                    //DisconnectVoiceChannel();
+                    //Task.Run(action: async () =>
+                    //{
+                    //    Log("Attempting full reconnection in 3 seconds");
+                    //    await Task.Delay(3000);
+                    //    await DisconnectAsync();
+                    //    await ConnectAsync();
+                    //});
+
+
                 }
                 catch (Exception e)
                 {
-                    Log("Excaption raised while leaving channel " + e.Message);
+                    Log("Exception disconnecting from channel");
                 }
-            }
 
-            if (currentServerVoiceChannelsUIDMap.ContainsKey(newVoiceChannel))
-            {
-                currentVoiceChannel = currentServer.GetVoiceChannel(currentServerVoiceChannelsUIDMap[newVoiceChannel]);
-                await currentVoiceChannel.ConnectAsync();
-            }
-
-            IAudioClient client;
-
-            if (currentServer.AudioClient != null)
-            {
-                client = currentServer.AudioClient;
-                var stream = client.CreatePCMStream(audioContent, audioBitrate, 1000, packetLoss );
-                //var stream = client.CreatePCMStream(AudioApplication.Voice ,128000 );
-                if (stream == null)
-                {
-                    Log("Unable to create output stream");
-                    return;
-                }
-                audioOutStream = (AudioOutStream)stream;
             }
             else
             {
-                Log("Audio client not connected");
+                Log("Audioclient disconnected");
             }
-            currentVoiceChannelName = newVoiceChannel;
+            return Task.CompletedTask;
         }
 
         private void DiscordConnectionView_CurrentServerChanged(object sender, string newServerName)
@@ -228,12 +421,13 @@ namespace DiscordAudioStreamService
             {
                 if (serversUIDMap.ContainsKey(newServerName))
                 {
-                    currentServer = discordSocketClient.GetGuild(serversUIDMap[newServerName]);
+                    //currentServer = discordSocketClient.GetGuild(serversUIDMap[newServerName]);
+                    ChangeVoiceChannel("");
                     currentServerName = newServerName;
                 }
                 else
                 {
-                    currentServer = null;
+                    //currentServer = null;
                     currentServerName = "";
                 }
                 UpdateVoiceChannels(currentServerName);
@@ -242,26 +436,38 @@ namespace DiscordAudioStreamService
 
         private Task DiscordSocketClient_Disconnected(Exception arg)
         {
+            Log("Disconnected from discord");
             if (DiscordConnectionView != null)
             {
                 DiscordConnectionView.Status = "Disconnected from discord";
                 DiscordConnectionView.StatusColour = StatusColourCode.Red;
             }
             this.Connected = false;
-            UpdateServers();
+            //UpdateServers();
+            // disable controls instead
             return Task.CompletedTask;
         }
 
         private Task DiscordSocketClient_Connected()
         {
+            Log("Connected to discord");
+            this.Connected = true;
             if (DiscordConnectionView != null) DiscordConnectionView.Status = "Connected to discord";
             return Task.CompletedTask;
         }
 
         private Task DiscordSocketClient_Ready()
         {
-            this.Connected = true;
+            Log("Discord client ready");
             UpdateServers();
+
+            // re enable controls
+
+            if ((currentServerName != "" ) && (currentVoiceChannelName != ""))
+            {
+                ReconnectVoiceChannel();
+            }
+
             if (DiscordConnectionView != null)
             {
                 DiscordConnectionView.Status = "Idle";
@@ -273,7 +479,7 @@ namespace DiscordAudioStreamService
         public async Task ConnectAsync()
         {
 
-            if ((discordBotKey == "") || (discordBotKey == null))
+            if ((discordBotToken == "") || (discordBotToken == null))
             {
                 if (_discordConnectionView != null)
                 {
@@ -290,7 +496,7 @@ namespace DiscordAudioStreamService
             DiscordConnectionView.StatusColour = StatusColourCode.Orange;
 
             if (DiscordConnectionView != null) DiscordConnectionView.Status = "Connecting to discord";
-            await discordSocketClient.LoginAsync(TokenType.Bot, discordBotKey);
+            await discordSocketClient.LoginAsync(TokenType.Bot, discordBotToken);
             await discordSocketClient.StartAsync();
         }
 
@@ -299,7 +505,7 @@ namespace DiscordAudioStreamService
             if (DiscordConnectionView != null) DiscordConnectionView.Status = "Disconnecting from discord";
             if (Connected || force)
             {
-                // review why callinng lougout is blocking on exit
+                // review why calling lougout is blocking on exit
                 if (!force)
                 {
                     try
@@ -406,13 +612,16 @@ namespace DiscordAudioStreamService
 
             try
             {
-                circularBuffer = new CircularBuffer(circularBufferSize);               
+                //circularBuffer = new CircularBuffer(circularBufferSize);               
                 audioIn = new WaveInEvent();
                 audioIn.WaveFormat = new WaveFormat(48000, 16, 2);
                 audioIn.BufferMilliseconds = captureBufferDuration;
                 audioIn.DeviceNumber = audioDeviceNameToIDMap[currentAudioDeviceName];
                 audioIn.DataAvailable += Audioin_DataAvailable;
                 audioIn.RecordingStopped += Audioin_RecordingStopped;
+                audioTxBuffer = new byte[48 * 4 * captureBufferDuration];
+                audioVisBuffer = new byte[48 * 4 * captureBufferDuration];
+
                 audioIn.StartRecording();
                 Log("Capture started");
             }
@@ -432,8 +641,9 @@ namespace DiscordAudioStreamService
                 {
                     audioIn.DataAvailable -= Audioin_DataAvailable;
                     audioIn.StopRecording();
-                    UpdateAudioCapureViewMeter(new byte[] { 0 }, 1);
-                    circularBuffer.Reset();
+
+                    UpdateAudioVisualisationAsync(new byte[] { 0 }, 1);
+                    //circularBuffer.Reset();
                 }
                 finally
                 {
@@ -449,42 +659,35 @@ namespace DiscordAudioStreamService
             //throw new System.NotImplementedException();
         }
 
-        private void Audioin_DataAvailable(object sender, WaveInEventArgs e)
+        private void Audioin_DataAvailable(object sender, WaveInEventArgs e )
         {
-            //Log("Bytes recorded " + e.BytesRecorded);
-
-            if (e.BytesRecorded >0)
-            {
-                // store the recorded data in a the circular buffer
-                // then tell a worker thread to send the content
-                //lock (circularBuffer)
-                //{
-                //    circularBuffer.Write(e.Buffer, 0, e.BytesRecorded);
-                //}
-                SendioAudioBufferAsync(e.Buffer, e.BytesRecorded);
-            }
-            UpdateAudioCapureViewMeter(e.Buffer, e.BytesRecorded);
+            // parallelise in two threads encoding+tx and visualisation
+            currentAudioBufferID += 1;
+            TransmitAudioBufferAsync(e.Buffer, e.BytesRecorded, currentAudioBufferID);
+            UpdateAudioVisualisationAsync(e.Buffer, e.BytesRecorded);
 
         }
 
-        public async void SendioAudioBufferAsync(byte [] buffer, int byteCount)
+        public async void TransmitAudioBufferAsync(byte [] buffer, int byteCount, uint bufferID)
         {
-            if (audioOutStream != null)
+            if ((audioOutStream != null) && byteCount > 0)
             {
-                if (DiscordConnectionView != null)
-                    DiscordConnectionView.Status = "Streaming";
-                //DestinationBlockSize = 3840
-                //byte[] buffer = new byte [3840 * 4];
-                //int byteCount = 0;
-                //while (circularBuffer.Count > 3840 * 8)
-                //{
-                //    lock (circularBuffer)
-                //    {
-                //        byteCount = circularBuffer.Read(buffer, 0, 3840 * 4);
-                //        if (byteCount == 0)
-                //            break;
-                //    }
-                if (byteCount % 3840 != 0)
+                lock (audioTxBuffer)
+                {
+                    lock (buffer)
+                    {
+                        if (audioTxBuffer.Length < byteCount)
+                            audioTxBuffer = new byte[byteCount];
+                        //System.Buffer.BlockCopy(buffer, 0, audioVisBuffer, 0, byteCount);
+                        Array.Copy(buffer, audioTxBuffer, byteCount);
+                    }
+
+                    if (DiscordConnectionView != null)
+                    {
+                        DiscordConnectionView.Status = "Streaming";
+                        DiscordConnectionView.StatusColour = StatusColourCode.Blue;
+                    }
+                    if (byteCount % 3840 != 0)
                         Log($"Audio buffer is {byteCount} bytes. This will result in partial frame.");
                     // lock the audioOutStreeam to prevent different threads to call 
                     // the opus encoder encode mehtod that does not seem to be thread safe
@@ -496,7 +699,11 @@ namespace DiscordAudioStreamService
                         {
                             try
                             {
-                                audioOutStream.WriteAsync(buffer, 0, byteCount).GetAwaiter().GetResult();
+                                if (lastAudioBufferSentID != bufferID - 1)
+                                    Debug.WriteLine($"Buffer ID out of squence by {lastAudioBufferSentID + 1 - bufferID }");
+                                audioOutStream.WriteAsync(audioTxBuffer, 0, byteCount).GetAwaiter().GetResult();
+                                lastAudioBufferSentID = bufferID;
+                                audioOutStream.FlushAsync();
                             }
                             catch (System.Exception ex)
                             {
@@ -504,37 +711,44 @@ namespace DiscordAudioStreamService
                             }
                             finally
                             {
-                                //audioOutStream.Flush();
-                                //audioOutStream.FlushAsync().GetAwaiter().GetResult();
-                                audioOutStream.FlushAsync();
                             }
                         }
-
                     }
-                //}
+                }
             }
         }
 
 
-        public void UpdateAudioCapureViewMeter(byte[] buffer, int bytesRecorded)
+        public async void UpdateAudioVisualisationAsync(byte[] buffer, int byteCount)
         {
             if (_audioCaptureView != null)
             {
-                // prevent overflow on trailing incomplete samples
-                if (bytesRecorded % 4 != 0) bytesRecorded -= bytesRecorded % 4;
                 short maxL = 0, maxR = 0;
-                for (int sampleIndex = 0; sampleIndex < bytesRecorded; sampleIndex += 4)
+                lock (audioVisBuffer)
                 {
-                    short sampleL = (short)((buffer[sampleIndex + 1] << 8) | buffer[sampleIndex + 0]);
-                    //if (sampleL < 0) sampleL = (short)(0-sampleL);
-                    // is Math.Abs implementation faster ?
-                    sampleL = Math.Abs(sampleL);
-                    if (sampleL > maxL) maxL = sampleL;
+                    lock (buffer)
+                    {
+                        if (audioVisBuffer.Length < byteCount)
+                            audioVisBuffer = new byte[byteCount];
+                        //System.Buffer.BlockCopy(buffer, 0, audioVisBuffer, 0, byteCount);
+                        Array.Copy(buffer, audioVisBuffer, byteCount);
+                    }
 
-                    short sampleR = (short)((buffer[sampleIndex + 3] << 8) | buffer[sampleIndex + 2]);
-                    sampleR = Math.Abs(sampleR);
-                    if (sampleR > maxR) maxR = sampleR;
+                    // prevent overflow on trailing incomplete samples
+                    if (byteCount % 4 != 0) byteCount -= byteCount % 4;
+                    for (int sampleIndex = 0; sampleIndex < byteCount; sampleIndex += 4)
+                    {
+                        short sampleL = (short)((audioVisBuffer[sampleIndex + 1] << 8) | audioVisBuffer[sampleIndex + 0]);
+                        //if (sampleL < 0) sampleL = (short)(0-sampleL);
+                        // is Math.Abs implementation faster ?
+                        sampleL = Math.Abs(sampleL);
+                        if (sampleL > maxL) maxL = sampleL;
 
+                        short sampleR = (short)((audioVisBuffer[sampleIndex + 3] << 8) | audioVisBuffer[sampleIndex + 2]);
+                        sampleR = Math.Abs(sampleR);
+                        if (sampleR > maxR) maxR = sampleR;
+
+                    }
                 }
                 // max samples as float 
                 float maxLF = maxL / 32768f;

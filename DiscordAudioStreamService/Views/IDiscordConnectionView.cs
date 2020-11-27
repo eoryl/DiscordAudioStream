@@ -7,7 +7,8 @@ namespace DiscordAudioStream.Views
     {
         Red,
         Orange,
-        Green
+        Green,
+        Blue
     };
 
     public interface IDiscordConnectionView
@@ -28,7 +29,7 @@ namespace DiscordAudioStream.Views
 
         event EventHandler<string> CurrentServerChanged;
         event EventHandler<string> CurrentVoiceChannelChanged;
-        event EventHandler<string> DiscordBotKeyChanged;
+        event EventHandler<string> DiscordBotTokenChanged;
         event EventHandler<string> AudioContentChanged;
         event EventHandler<int> AudioBitrateChanged;
 

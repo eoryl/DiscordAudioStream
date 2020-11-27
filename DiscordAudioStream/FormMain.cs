@@ -14,6 +14,8 @@ namespace DiscordAudioStream
     {
 
         private AudioStreamingService audioStreamingService;
+        private bool updatingServerList = false;
+        private bool updatingChannelList = false;
 
         public FormMain()
         {
@@ -53,8 +55,19 @@ namespace DiscordAudioStream
                     this.comboBoxDiscordServer.Invoke(new Action(
                         () =>
                         {
+                            updatingServerList = true;
+
+                            string oldServer = comboBoxDiscordServer.Text;
+
                             this.comboBoxDiscordServer.Items.Clear();
                             this.comboBoxDiscordServer.Items.AddRange(value.ToArray<string>());
+                            if (comboBoxDiscordServer.Items.Contains(oldServer))
+                                comboBoxDiscordServer.Text = oldServer;
+                            updatingServerList = false;
+
+                            if (comboBoxDiscordServer.Text != oldServer)
+                                CurrentServerChanged?.Invoke(this, comboBoxDiscordServer.Text);
+
                         }
                         )
                     );
@@ -129,11 +142,11 @@ namespace DiscordAudioStream
         {
             get
             {
-                return Properties.Settings.Default.DiscordBotKey;
+                return Properties.Settings.Default.DiscordBotToken;
             }
             set
             {
-                Properties.Settings.Default.DiscordBotKey = value;
+                Properties.Settings.Default.DiscordBotToken = value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -149,6 +162,7 @@ namespace DiscordAudioStream
                                 if (value == StatusColourCode.Red) toolStripStatusIcon.Image = Properties.Resources.icon_cross;
                                 else if (value == StatusColourCode.Orange) toolStripStatusIcon.Image = Properties.Resources.icon_question_mark;
                                 else if (value == StatusColourCode.Green) toolStripStatusIcon.Image = Properties.Resources.icon_check_green;
+                                else if (value == StatusColourCode.Blue) toolStripStatusIcon.Image = Properties.Resources.icon_streaming;
                             }
                             )
                     );
@@ -161,7 +175,7 @@ namespace DiscordAudioStream
         public event EventHandler<string> CurrentServerChanged;
         public event EventHandler<string> CurrentVoiceChannelChanged;
         public event EventHandler<string> SelectedAudioDeviceChanged;
-        public event EventHandler<string> DiscordBotKeyChanged;
+        public event EventHandler<string> DiscordBotTokenChanged;
         public event EventHandler<string> AudioContentChanged;
         public event EventHandler<int> AudioBitrateChanged;
 
@@ -170,10 +184,11 @@ namespace DiscordAudioStream
             audioStreamingService = new AudioStreamingService(this, this);
             // TODO : 
             // redo that properly with with an interface to load settings
-            audioStreamingService.DiscordBotKey = Properties.Settings.Default.DiscordBotKey;
+            audioStreamingService.DiscordBotToken = Properties.Settings.Default.DiscordBotToken;
             audioStreamingService.CaptureBufferDuration = Properties.Settings.Default.AudioCaptureBufferMS;
             audioStreamingService.AudioBitrate = Properties.Settings.Default.AudioBitrate;
             audioStreamingService.AudioContent = Properties.Settings.Default.AudioContent;
+            audioStreamingService.StreamingBufferDuration = Properties.Settings.Default.StreamingBufferDuration;
             audioStreamingService.Initialize();
         }
 
@@ -232,7 +247,7 @@ namespace DiscordAudioStream
 
         private void comboBoxDiscordServer_SelectedIndexChanged(object sender, EventArgs e)
         {
-            CurrentServerChanged?.Invoke(this, comboBoxDiscordServer.Text);
+            if (!updatingServerList) CurrentServerChanged?.Invoke(this, comboBoxDiscordServer.Text);
 
         }
 
@@ -257,7 +272,7 @@ namespace DiscordAudioStream
 
         private void comboBoxDiscordVoiceChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
-            CurrentVoiceChannelChanged?.Invoke(this, comboBoxDiscordVoiceChannel?.Text);
+            if (!updatingChannelList) CurrentVoiceChannelChanged?.Invoke(this, comboBoxDiscordVoiceChannel?.Text);
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -284,9 +299,10 @@ namespace DiscordAudioStream
 
             using (FormSettings formSettings = new FormSettings())
             {
-                if (formSettings.ShowDialog(this) == DialogResult.OK)
+                if (formSettings.ShowDialog() == DialogResult.OK)
                 {
                     Properties.Settings.Default.Save();
+                    MessageBox.Show("Application restart needed to apply new parameters.");
                 }
                 else
                 {

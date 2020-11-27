@@ -12,7 +12,7 @@ namespace DiscordAudioStream.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -26,12 +26,12 @@ namespace DiscordAudioStream.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DiscordBotKey {
+        public string DiscordBotToken {
             get {
-                return ((string)(this["DiscordBotKey"]));
+                return ((string)(this["DiscordBotToken"]));
             }
             set {
-                this["DiscordBotKey"] = value;
+                this["DiscordBotToken"] = value;
             }
         }
         
@@ -73,7 +73,7 @@ namespace DiscordAudioStream.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131072")]
+        [global::System.Configuration.DefaultSettingValueAttribute("98304")]
         public int AudioBitrate {
             get {
                 return ((int)(this["AudioBitrate"]));
@@ -92,6 +92,18 @@ namespace DiscordAudioStream.Properties {
             }
             set {
                 this["PacketLoss"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int StreamingBufferDuration {
+            get {
+                return ((int)(this["StreamingBufferDuration"]));
+            }
+            set {
+                this["StreamingBufferDuration"] = value;
             }
         }
     }

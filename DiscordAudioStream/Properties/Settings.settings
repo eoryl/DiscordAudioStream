@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DiscordAudioStream.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="DiscordBotKey" Type="System.String" Scope="User">
+    <Setting Name="DiscordBotToken" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AudioCaptureBufferMS" Type="System.Int32" Scope="User">
@@ -15,10 +15,13 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AudioBitrate" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131072</Value>
+      <Value Profile="(Default)">98304</Value>
     </Setting>
     <Setting Name="PacketLoss" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="StreamingBufferDuration" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

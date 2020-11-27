@@ -12,6 +12,7 @@ namespace DiscordAudioStream
             labelAudioCaptureSizeValue.Text = $"{trackBarAudioCaptureBuffer.Value} ms";
             labelPacketLossValue.Text = $"{trackBarPacketLoss.Value}%";
             labelEncoderBirateValue.Text = "" + trackBarEncoderBirate.Value/1024 + " kbps";
+            labelStreamingBufferDurationValue.Text = $"{trackBarStreamingBufferDuration.Value} ms";
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -66,6 +67,12 @@ namespace DiscordAudioStream
         private void trackBarPacketLoss_ValueChanged(object sender, EventArgs e)
         {
             labelPacketLossValue.Text = $"{trackBarPacketLoss.Value}%";
+        }
+
+        private void trackBarStreamingBufferDuration_ValueChanged(object sender, EventArgs e)
+        {
+            if (trackBarStreamingBufferDuration.Value % 20 > 0) trackBarStreamingBufferDuration.Value -= trackBarStreamingBufferDuration.Value % 20;
+            labelStreamingBufferDurationValue.Text = $"{trackBarStreamingBufferDuration.Value} ms"; 
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -16,6 +17,11 @@ namespace DiscordAudioStream
         [STAThread]
         static void Main()
         {
+
+            // change process priority 
+            Process.GetCurrentProcess().PriorityBoostEnabled = true;
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
             // single instance code
 
