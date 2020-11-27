@@ -16,6 +16,7 @@ After compilation add the dependencies dlls (32bit version) opus.dll and libsodi
 
 # Setup
 * Get latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
+* DiscordAudioStream and its dependicies require .NET 4.6.1 runtime. If you are running on Windows 10 up to date you should have the correct version of .Net runtime. If not or running Windows 7 install .NET 4.6.1 runtime or a later .NET 4 framework. .NET framework 4.6.1 can be found here https://www.microsoft.com/en-us/download/details.aspx?id=49981
 * Install Visual C++ 2019 x86 redist from here https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 * Install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
 * Optionally use 48khz audio in your playiut app and set the virtual audio card is set to 48khz 16bit stereo as well in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is to avoid unecessary resampling and dithering along the chain.
