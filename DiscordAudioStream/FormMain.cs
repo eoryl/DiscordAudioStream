@@ -30,18 +30,25 @@ namespace DiscordAudioStream
             }
             set
             {
-                statusStripMain?.Invoke(
-                    new Action(
-                            () =>
-                            {
-                                if (statusStripMain != null)
+                try
+                {
+                    statusStripMain?.Invoke(
+                        new Action(
+                                () =>
                                 {
-                                    if (statusStripMain.Items["toolStripStatusLabelMessage"].Text != value)
-                                        statusStripMain.Items["toolStripStatusLabelMessage"].Text = value;
+                                    if (statusStripMain != null)
+                                    {
+                                        if (statusStripMain.Items["toolStripStatusLabelMessage"].Text != value)
+                                            statusStripMain.Items["toolStripStatusLabelMessage"].Text = value;
+                                    }
                                 }
-                            }
-                            )
-                    );
+                                )
+                        );
+                }
+                catch (Exception e)
+                {
+                    System.Console.WriteLine("Failed to update status strip: " + e.Message);
+                }
             }
         }
 
@@ -125,23 +132,27 @@ namespace DiscordAudioStream
                     comboBoxDiscordVoiceChannel.SelectedItem = value;
             }
         }
-        ICollection<string> IAudioCaptureView.AudioDevices
+        ICollection<AudioCaptureDeviceInfo> IAudioCaptureView.AudioDevices
         {
             get
             {
-                List<string> res = new List<string>();
-                foreach (string s in comboBoxAudioDevice.Items)
-                    res.Add(s);
-                return res;
+                //List<string> res = new List<string>();
+                //foreach (string s in comboBoxAudioDevice.Items)
+                //    res.Add(s);
+                //return res;
+                return null;
             }
             set
             {
-                comboBoxAudioDevice.Items.Clear();
-                if (value != null) comboBoxAudioDevice.Items.AddRange(value.ToArray<Object>());
+                comboBoxAudioDevice.ValueMember = "DeviceID";
+                comboBoxAudioDevice.DisplayMember = "DisplayName";
+                comboBoxAudioDevice.DataSource = value;
+                //comboBoxAudioDevice.Items.Clear();
+                //if (value != null) comboBoxAudioDevice.Items.AddRange(value.ToArray<Object>());
             }
         }
 
-        string IAudioCaptureView.SelectedAudioDevice { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        string IAudioCaptureView.SelectedAudioDeviceID { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public string DiscordBotToken
         {
             get
@@ -178,10 +189,11 @@ namespace DiscordAudioStream
 
         public event EventHandler<string> CurrentServerChanged;
         public event EventHandler<string> CurrentVoiceChannelChanged;
-        public event EventHandler<string> SelectedAudioDeviceChanged;
+        public event EventHandler<string> SelectedAudioDeviceIDChanged;
         public event EventHandler<string> DiscordBotTokenChanged;
         public event EventHandler<string> AudioContentChanged;
         public event EventHandler<int> AudioBitrateChanged;
+        public event EventHandler ViewRefreshRequested;
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -190,36 +202,44 @@ namespace DiscordAudioStream
             // redo that properly with with an interface to load settings
             audioStreamingService.DiscordBotToken = Properties.Settings.Default.DiscordBotToken;
             audioStreamingService.CaptureBufferDuration = Properties.Settings.Default.AudioCaptureBufferMS;
-            audioStreamingService.AudioBitrate = Properties.Settings.Default.AudioBitrate;
+            audioStreamingService.AudioBitrate = Properties.Settings.Default.AudioBitrate * 1024;
             audioStreamingService.AudioContent = Properties.Settings.Default.AudioContent;
             audioStreamingService.StreamingBufferDuration = Properties.Settings.Default.StreamingBufferDuration;
+            audioStreamingService.AudioCaptureAPI = AudioStreamingService.ParseAudioAPI( Properties.Settings.Default.CaptureAPI);
             audioStreamingService.Initialize();
         }
 
-        void IAudioCaptureView.SetLevel(float leftChannel, float rightChannel)
+        void IAudioCaptureView.SetPeak(float leftChannel, float rightChannel)
         {
-            if (this.peakMeterL.InvokeRequired)
+            try
             {
-                this.peakMeterL.Invoke(new Action(
-                    () => peakMeterL.Level = leftChannel
-                    )
-                );
-            }
-            else
-            {
-                peakMeterL.Level = leftChannel;
-            }
+                if (this.peakMeterL.InvokeRequired)
+                {
+                        this.peakMeterL.Invoke(new Action(
+                            () => peakMeterL.Level = leftChannel
+                            )
+                        );
+                }
+                else
+                {
+                    peakMeterL.Level = leftChannel;
+                }
 
-            if (this.peakMeterR.InvokeRequired)
-            {
-                this.peakMeterR.Invoke(new Action(
-                    () => peakMeterR.Level = rightChannel
-                    )
-                );
+                if (this.peakMeterR.InvokeRequired)
+                {
+                    this.peakMeterR.Invoke(new Action(
+                        () => peakMeterR.Level = rightChannel
+                        )
+                    );
+                }
+                else
+                {
+                    peakMeterR.Level = rightChannel;
             }
-            else
+            }
+            catch (Exception e)
             {
-                peakMeterR.Level = rightChannel;
+                System.Console.WriteLine("failed to update peak: " + e.Message);
             }
 
             /*
@@ -279,6 +299,8 @@ namespace DiscordAudioStream
             if (!updatingChannelList) CurrentVoiceChannelChanged?.Invoke(this, comboBoxDiscordVoiceChannel?.Text);
         }
 
+
+
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             audioStreamingService.Terminate();
@@ -295,7 +317,7 @@ namespace DiscordAudioStream
 
         private void comboBoxAudioDevice_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (SelectedAudioDeviceChanged != null) SelectedAudioDeviceChanged(this, comboBoxAudioDevice.Text);
+            if (SelectedAudioDeviceIDChanged != null) SelectedAudioDeviceIDChanged(this, comboBoxAudioDevice.SelectedValue.ToString());
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)

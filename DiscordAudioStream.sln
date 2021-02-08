@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordAudioStreamService",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsAudioControls", "WindowsFormsAudioControls\WindowsFormsAudioControls.csproj", "{E30447B6-6F28-46C4-83D6-1D9AEE055BB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioProcessing", "AudioProcessing\AudioProcessing.csproj", "{AFC6A6C9-9354-4FDA-866D-335BB4572BA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioProcessing", "AudioProcessing\AudioProcessing.csproj", "{FCE3E7FE-9CC6-4587-A3FC-9F9A55A59D0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{E30447B6-6F28-46C4-83D6-1D9AEE055BB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E30447B6-6F28-46C4-83D6-1D9AEE055BB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E30447B6-6F28-46C4-83D6-1D9AEE055BB4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AFC6A6C9-9354-4FDA-866D-335BB4572BA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFC6A6C9-9354-4FDA-866D-335BB4572BA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AFC6A6C9-9354-4FDA-866D-335BB4572BA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AFC6A6C9-9354-4FDA-866D-335BB4572BA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE3E7FE-9CC6-4587-A3FC-9F9A55A59D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE3E7FE-9CC6-4587-A3FC-9F9A55A59D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE3E7FE-9CC6-4587-A3FC-9F9A55A59D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE3E7FE-9CC6-4587-A3FC-9F9A55A59D0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

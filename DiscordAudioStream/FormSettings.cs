@@ -11,7 +11,7 @@ namespace DiscordAudioStream
             InitializeComponent();
             labelAudioCaptureSizeValue.Text = $"{trackBarAudioCaptureBuffer.Value} ms";
             labelPacketLossValue.Text = $"{trackBarPacketLoss.Value}%";
-            labelEncoderBirateValue.Text = "" + trackBarEncoderBirate.Value/1024 + " kbps";
+            labelEncoderBirateValue.Text = "" + trackBarEncoderBirate.Value+ " kbps";
             labelStreamingBufferDurationValue.Text = $"{trackBarStreamingBufferDuration.Value} ms";
         }
 
@@ -50,8 +50,8 @@ namespace DiscordAudioStream
 
         private void trackBarEncoderBirate_ValueChanged(object sender, EventArgs e)
         {
-            if (trackBarEncoderBirate.Value % 8192 != 0) trackBarEncoderBirate.Value -= (trackBarEncoderBirate.Value % 8192);
-            labelEncoderBirateValue.Text = "" + trackBarEncoderBirate.Value /1024 + " kbps";
+            if (trackBarEncoderBirate.Value % 8 != 0) trackBarEncoderBirate.Value -= (trackBarEncoderBirate.Value % 8);
+            labelEncoderBirateValue.Text = "" + trackBarEncoderBirate.Value + " kbps";
         }
 
         private void comboBoxContentType_TextChanged(object sender, EventArgs e)
@@ -73,6 +73,11 @@ namespace DiscordAudioStream
         {
             if (trackBarStreamingBufferDuration.Value % 20 > 0) trackBarStreamingBufferDuration.Value -= trackBarStreamingBufferDuration.Value % 20;
             labelStreamingBufferDurationValue.Text = $"{trackBarStreamingBufferDuration.Value} ms"; 
+        }
+
+        private void trackBarEncoderBirate_Scroll(object sender, EventArgs e)
+        {
+
         }
     }
 }

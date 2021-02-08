@@ -92,6 +92,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioBufferConverter.cs" />
     <Compile Include="AudioStreamingService.cs" />
     <Compile Include="DirectSoundCaptureWaveIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

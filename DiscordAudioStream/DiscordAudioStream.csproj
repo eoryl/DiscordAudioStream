@@ -143,6 +143,7 @@
     <Content Include="Licences\libopus.txt" />
     <Content Include="Licences\libsodium.txt" />
     <Content Include="Licences\NAudio.txt" />
+    <Content Include="Licences\PeakLimiter.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DiscordAudioStreamService\DiscordAudioStreamService.csproj">

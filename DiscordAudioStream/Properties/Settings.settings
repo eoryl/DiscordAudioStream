@@ -15,13 +15,16 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AudioBitrate" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">98304</Value>
+      <Value Profile="(Default)">96</Value>
     </Setting>
     <Setting Name="PacketLoss" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="StreamingBufferDuration" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="CaptureAPI" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

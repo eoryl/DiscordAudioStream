@@ -5,6 +5,7 @@ using DiscordAudioStream;
 using DiscordAudioStream.Views;
 using NAudio.Utils;
 using NAudio.Wave;
+using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,9 +16,19 @@ using System.Threading.Tasks;
 namespace DiscordAudioStreamService
 {
 
+    public enum AudioAPI
+    {
+        MME,
+        MME_Event,
+        WASAPI_Exclusive,
+        WASAPI_Shared,
+        WASAPI_Loopback
+    }
+
 
     public class AudioStreamingService
     {
+
 
 
         // discord 
@@ -38,10 +49,11 @@ namespace DiscordAudioStreamService
         private byte[] audioTxBuffer;
 
         // audio 
-        private WaveInEvent audioIn = null;
+        AudioAPI audioCaptureAPI = AudioAPI.MME;
+        private IWaveIn audioIn = null;
         private int captureBufferDuration;
-        private string currentAudioDeviceName = "";
-        private ConcurrentDictionary<string, int> audioDeviceNameToIDMap = new ConcurrentDictionary<string, int>();
+        private string currentAudioDevice = "";
+        //private ConcurrentDictionary<string, int> audioDeviceNameToIDMap = new ConcurrentDictionary<string, int>();
         //private CircularBuffer circularBuffer;
         //private int circularBufferSize;
         private byte[] audioVisBuffer;
@@ -61,12 +73,18 @@ namespace DiscordAudioStreamService
 
         public AudioStreamingService(IDiscordConnectionView discordConnectionView, IAudioCaptureView audioCaptureView)
         {
-            // ask NAudio to send buffers by 40ms block
-            captureBufferDuration = 40;
+             // ask NAudio to send buffers by 40ms block
+             captureBufferDuration = 40;
             streamingBufferDuration = 1000;
             // 96kbps (high quality) 
             // Opus supports bitrate from 6kbps to 510kbps
-            // Discord won't go above 128kbps for boosted servers only 96kbps for standard
+            // Default channel bitrate at the time this is being written is 64k 
+            // you need to change the channel setting to go to 96k
+            // Discord won't go above 128kbps for boosted servers and only 96kbps for standard
+            // According to Opus the quality increase from 96k to 128k is marginal anyway
+            // https://opus-codec.org/comparison/
+            // quality issue is most likely due to packet loss / jittering and discord 
+            // putting forward low latency vs quality
             audioBitrate = 96 * 1024;
             packetLoss = 15;
             audioContent = AudioApplication.Music;
@@ -89,6 +107,15 @@ namespace DiscordAudioStreamService
             discordSocketClient.UserVoiceStateUpdated += DiscordSocketClient_UserVoiceStateUpdated;
             
             
+        }
+
+        public static AudioAPI ParseAudioAPI(string api)
+        {
+            if (api == "MME") return AudioAPI.MME;
+            else if (api == "WASAPI shared") return AudioAPI.WASAPI_Shared;
+            else if (api == "WASAPI exclusive") return AudioAPI.WASAPI_Exclusive;
+            else if (api == "WASAPI loopback") return AudioAPI.WASAPI_Loopback;
+            else return AudioAPI.MME_Event;
         }
 
         private Task DiscordSocketClient_UserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3)
@@ -140,8 +167,10 @@ namespace DiscordAudioStreamService
         }
         public async void Terminate()
         {
+            StopCapture();
             DiscordConnectionView = null;
             AudioCaptureView = null;
+
             Task task = DisconnectAsync(true);
 
             if (await Task.WhenAny(task, Task.Delay(3000)) == task)
@@ -161,17 +190,17 @@ namespace DiscordAudioStreamService
             set
             {
                 _audioCaptureView = value;
-                if (_audioCaptureView != null) _audioCaptureView.SelectedAudioDeviceChanged += AudioCaptureView_SelectedDeviceChanged;
+                if (_audioCaptureView != null) _audioCaptureView.SelectedAudioDeviceIDChanged += AudioCaptureView_SelectedDeviceChanged;
             }
         }
 
         private void AudioCaptureView_SelectedDeviceChanged(object sender, string newAudioDeviceName)
         {
             Log("Changing audio device to " + newAudioDeviceName);
-            if (currentAudioDeviceName != newAudioDeviceName)
+            if (currentAudioDevice != newAudioDeviceName)
             {
                 StopCapture();
-                currentAudioDeviceName = newAudioDeviceName;
+                currentAudioDevice = newAudioDeviceName;
                 StartCapture();
             }
         }
@@ -205,6 +234,18 @@ namespace DiscordAudioStreamService
                 else if (value.ToLower().Equals("music")) audioContent = AudioApplication.Music;
                 else audioContent = AudioApplication.Mixed; 
             } 
+        }
+
+        public AudioAPI AudioCaptureAPI
+        {
+            get
+            {
+                return audioCaptureAPI;
+            }
+            set
+            {
+                audioCaptureAPI = value;
+            }
         }
 
         public int PacketLoss { get => packetLoss; set => packetLoss = value; }
@@ -317,7 +358,6 @@ namespace DiscordAudioStreamService
                 return currentServer.GetVoiceChannel(currentServerVoiceChannelsUIDMap[currentVoiceChannelName]); ;
             }
         }
-
 
         public async void ChangeVoiceChannel(string newVoiceChannel)
         {
@@ -529,14 +569,34 @@ namespace DiscordAudioStreamService
         void UpdateAudioDevicesList()
         {
 
-            List<string> list = new List<string>(WaveIn.DeviceCount + 2);
-            audioDeviceNameToIDMap.Clear();
-            list.Insert(0, "");
-            for (int i = -1; i < WaveIn.DeviceCount; i++)
+            List<AudioCaptureDeviceInfo> list = new List<AudioCaptureDeviceInfo>(WaveIn.DeviceCount + 2);
+            list.Insert(0, new AudioCaptureDeviceInfo("",""));
+
+            if ((audioCaptureAPI == AudioAPI.MME) || (audioCaptureAPI == AudioAPI.MME_Event))
             {
-                string compoundName = "" + (i + 1) + " - " + WaveIn.GetCapabilities(i).ProductName;
-                audioDeviceNameToIDMap[compoundName] = i;
-                list.Insert(i + 2, compoundName);
+                for (int i = -1; i < WaveIn.DeviceCount; i++)
+                {
+                    list.Insert(i + 2, new AudioCaptureDeviceInfo(WaveIn.GetCapabilities(i).ProductName, ""+i) );
+                }
+            }
+            else if ((audioCaptureAPI == AudioAPI.WASAPI_Exclusive ) || (audioCaptureAPI == AudioAPI.WASAPI_Shared))
+            {
+                MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
+                MMDeviceCollection devices = deviceEnum.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+                foreach (MMDevice device in devices)
+                {
+                    list.Add(new AudioCaptureDeviceInfo(device.FriendlyName, device.ID.ToString()) );
+                }
+
+            }
+            else if (audioCaptureAPI == AudioAPI.WASAPI_Loopback)
+            {
+                MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
+                MMDeviceCollection devices = deviceEnum.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                foreach (MMDevice device in devices)
+                {
+                    list.Add(new AudioCaptureDeviceInfo(device.FriendlyName, device.ID.ToString()));
+                }
             }
 
             if (AudioCaptureView != null) AudioCaptureView.AudioDevices = list;
@@ -599,26 +659,97 @@ namespace DiscordAudioStreamService
             return Task.CompletedTask;
         }
 
+        private IWaveIn CreateCapture()
+        {
+            IWaveIn iWaveIn = null;
+
+            if (audioCaptureAPI == AudioAPI.MME_Event)
+            {
+                try
+                {
+                    int deviceID = -1;
+                    WaveInEvent waveInEvent = new WaveInEvent();
+                    waveInEvent.WaveFormat = new WaveFormat(48000, 16, 2);
+                    waveInEvent.BufferMilliseconds = captureBufferDuration;
+                    if (!int.TryParse(currentAudioDevice, out deviceID))
+                        deviceID = -1;
+                    waveInEvent.DeviceNumber = deviceID;
+                    iWaveIn = waveInEvent;
+                }
+                catch (Exception e)
+                {
+                    Log("Exception creating MME event capture device" + e.Message);
+                }
+            }
+            else if (audioCaptureAPI == AudioAPI.MME)
+            {
+                try
+                {
+                    int deviceID = -1;
+                    WaveIn waveIn = new WaveIn();
+                    waveIn.WaveFormat = new WaveFormat(48000, 16, 2);
+                    waveIn.BufferMilliseconds = captureBufferDuration;
+                    if (!int.TryParse(currentAudioDevice, out deviceID))
+                        deviceID = -1;
+                    waveIn.DeviceNumber = deviceID;
+                    iWaveIn = waveIn;
+                }
+                catch (Exception e)
+                {
+                    Log("Exception creating MME capture device" + e.Message);
+                }
+            }
+            else if (audioCaptureAPI == AudioAPI.WASAPI_Exclusive)
+            {
+                MMDeviceEnumerator mmDevEnum = new MMDeviceEnumerator();               
+                WasapiCapture wasapiCapture = new WasapiCapture(mmDevEnum.GetDevice(currentAudioDevice));
+                wasapiCapture.ShareMode = AudioClientShareMode.Exclusive;
+                //wasapiCapture.WaveFormat = new WaveFormat(48000, 16, 2);
+                iWaveIn = wasapiCapture;
+            }
+            else if (audioCaptureAPI == AudioAPI.WASAPI_Shared)
+            {
+                MMDeviceEnumerator mmDevEnum = new MMDeviceEnumerator();
+                WasapiCapture wasapiCapture = new WasapiCapture(mmDevEnum.GetDevice(currentAudioDevice));
+                wasapiCapture.ShareMode = AudioClientShareMode.Shared;
+                //wasapiCapture.WaveFormat = new WaveFormat(48000, 16, 2);
+                iWaveIn = wasapiCapture;
+            }
+            else if(audioCaptureAPI == AudioAPI.WASAPI_Loopback)
+            {
+                MMDeviceEnumerator mmDevEnum = new MMDeviceEnumerator();
+                WasapiLoopbackCapture wasapiCapture = new WasapiLoopbackCapture(mmDevEnum.GetDevice(currentAudioDevice));
+                wasapiCapture.ShareMode = AudioClientShareMode.Shared;
+                //wasapiCapture.WaveFormat = new WaveFormat(48000, 16, 2);
+                iWaveIn = wasapiCapture;
+            }
+
+            return iWaveIn;
+        }
+
         private void StartCapture()
         {
             Log("Starting Capture");
 
-            if (!audioDeviceNameToIDMap.ContainsKey(currentAudioDeviceName))
+            if (currentAudioDevice == "")
             {
-                Log("Device does not exist");
+                Log("No device selected");
                 return;
             }
 
 
             try
             {
-                //circularBuffer = new CircularBuffer(circularBufferSize);               
-                audioIn = new WaveInEvent();
-                audioIn.WaveFormat = new WaveFormat(48000, 16, 2);
-                audioIn.BufferMilliseconds = captureBufferDuration;
-                audioIn.DeviceNumber = audioDeviceNameToIDMap[currentAudioDeviceName];
+                audioIn = CreateCapture();
+                if (audioIn == null)
+                {
+                    Log("No device available for capture");
+                    return;
+                }
                 audioIn.DataAvailable += Audioin_DataAvailable;
                 audioIn.RecordingStopped += Audioin_RecordingStopped;
+
+
                 audioTxBuffer = new byte[48 * 4 * captureBufferDuration];
                 audioVisBuffer = new byte[48 * 4 * captureBufferDuration];
 
@@ -647,7 +778,7 @@ namespace DiscordAudioStreamService
                 }
                 finally
                 {
-                    audioIn.Dispose();
+                    //audioIn.Dispose();
                     audioIn = null;
                 }
             }
@@ -663,9 +794,45 @@ namespace DiscordAudioStreamService
         {
             // parallelise in two threads encoding+tx and visualisation
             currentAudioBufferID += 1;
-            TransmitAudioBufferAsync(e.Buffer, e.BytesRecorded, currentAudioBufferID);
-            UpdateAudioVisualisationAsync(e.Buffer, e.BytesRecorded);
 
+
+            int bitdepth = this.audioIn.WaveFormat.BitsPerSample;
+            int channels = this.audioIn.WaveFormat.Channels;
+            byte[] buffer = null;
+            int bufferlen = 0;
+
+            if (!((channels == 1) || (channels == 2)))
+                return;
+
+            // convert to correct bitdepth if needed
+            if (bitdepth == 16)
+            {
+                buffer = e.Buffer;
+                bufferlen = e.BytesRecorded;
+            }
+            else if ((bitdepth == 32) || (bitdepth == 24) || (bitdepth == 8))
+            {
+                short[] buffer16 = null;
+                int buffer16len = 0;
+                AudioBufferConverter.ConvertBitDepthTo16bit(e.Buffer, e.BytesRecorded, bitdepth, ref buffer16, ref buffer16len);
+                AudioBufferConverter.ConvertShortArrayToByte(buffer16, buffer16len, ref buffer, ref bufferlen);
+            }
+
+            if ((buffer == null) || (bufferlen <= 0)) return;
+
+            // mono to stereo if needed
+            if (channels == 1)
+            {
+                byte[] bufferstereo = null;
+                int bufferstereolen = 0;
+                AudioBufferConverter.MonoToStereo(buffer, bufferlen, ref bufferstereo, ref bufferstereolen);
+                buffer = bufferstereo;
+                bufferlen = bufferstereolen;
+            }
+
+               
+            TransmitAudioBufferAsync(buffer, bufferlen, currentAudioBufferID);
+            UpdateAudioVisualisationAsync(buffer, bufferlen);
         }
 
         public async void TransmitAudioBufferAsync(byte [] buffer, int byteCount, uint bufferID)
@@ -684,8 +851,15 @@ namespace DiscordAudioStreamService
 
                     if (DiscordConnectionView != null)
                     {
-                        DiscordConnectionView.Status = "Streaming";
-                        DiscordConnectionView.StatusColour = StatusColourCode.Blue;
+                        try
+                        {
+                            DiscordConnectionView.Status = "Streaming";
+                            DiscordConnectionView.StatusColour = StatusColourCode.Blue;
+                        }
+                        catch(Exception e)
+                        {
+                            System.Console.WriteLine("Failed to update status: " + e.Message);
+                        }
                     }
                     if (byteCount % 3840 != 0)
                         Log($"Audio buffer is {byteCount} bytes. This will result in partial frame.");
@@ -738,26 +912,28 @@ namespace DiscordAudioStreamService
                     if (byteCount % 4 != 0) byteCount -= byteCount % 4;
                     for (int sampleIndex = 0; sampleIndex < byteCount; sampleIndex += 4)
                     {
+
                         short sampleL = (short)((audioVisBuffer[sampleIndex + 1] << 8) | audioVisBuffer[sampleIndex + 0]);
-                        //if (sampleL < 0) sampleL = (short)(0-sampleL);
                         // is Math.Abs implementation faster ?
-                        sampleL = Math.Abs(sampleL);
+                        // workaround add 1 to negative to avoid overflow if value is -32768
+                        if (sampleL < 0) sampleL = (short)(1 - sampleL);
                         if (sampleL > maxL) maxL = sampleL;
 
                         short sampleR = (short)((audioVisBuffer[sampleIndex + 3] << 8) | audioVisBuffer[sampleIndex + 2]);
-                        sampleR = Math.Abs(sampleR);
+                        //sampleR = Math.Abs(sampleR);
+                        if (sampleR < 0) sampleR = (short)(1 - sampleR);
                         if (sampleR > maxR) maxR = sampleR;
 
                     }
                 }
                 // max samples as float 
-                float maxLF = maxL / 32768f;
-                float maxRF = maxR / 32768f;
+                float maxLF = maxL / 32767f;
+                float maxRF = maxR / 32767f;
 
                 // values in dbfs -infinity to 0 
                 float dBFSvalueL = 20.0f * (float)Math.Log10(maxLF);
                 float dBFSvalueR = 20.0f * (float)Math.Log10(maxRF);
-                AudioCaptureView.SetLevel(dBFSvalueL, dBFSvalueR);
+                AudioCaptureView.SetPeak(dBFSvalueL, dBFSvalueR);
 
             }
         }

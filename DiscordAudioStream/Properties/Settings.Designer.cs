@@ -73,7 +73,7 @@ namespace DiscordAudioStream.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("98304")]
+        [global::System.Configuration.DefaultSettingValueAttribute("96")]
         public int AudioBitrate {
             get {
                 return ((int)(this["AudioBitrate"]));
@@ -104,6 +104,18 @@ namespace DiscordAudioStream.Properties {
             }
             set {
                 this["StreamingBufferDuration"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CaptureAPI {
+            get {
+                return ((string)(this["CaptureAPI"]));
+            }
+            set {
+                this["CaptureAPI"] = value;
             }
         }
     }

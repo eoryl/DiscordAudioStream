@@ -41,6 +41,8 @@
             this.labelPacketLossValue = new System.Windows.Forms.Label();
             this.labelStreamingBufferDuration = new System.Windows.Forms.Label();
             this.labelStreamingBufferDurationValue = new System.Windows.Forms.Label();
+            this.labelCaptureAPI = new System.Windows.Forms.Label();
+            this.comboBoxCaptureAPI = new System.Windows.Forms.ComboBox();
             this.trackBarStreamingBufferDuration = new System.Windows.Forms.TrackBar();
             this.trackBarPacketLoss = new System.Windows.Forms.TrackBar();
             this.comboBoxContentType = new System.Windows.Forms.ComboBox();
@@ -65,7 +67,7 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(428, 336);
+            this.buttonOK.Location = new System.Drawing.Point(428, 344);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 2;
@@ -76,7 +78,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.Location = new System.Drawing.Point(509, 336);
+            this.buttonCancel.Location = new System.Drawing.Point(509, 344);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 3;
@@ -87,7 +89,7 @@
             // labelAudioCaptureBufferSize
             // 
             this.labelAudioCaptureBufferSize.AutoSize = true;
-            this.labelAudioCaptureBufferSize.Location = new System.Drawing.Point(12, 82);
+            this.labelAudioCaptureBufferSize.Location = new System.Drawing.Point(12, 119);
             this.labelAudioCaptureBufferSize.Name = "labelAudioCaptureBufferSize";
             this.labelAudioCaptureBufferSize.Size = new System.Drawing.Size(166, 17);
             this.labelAudioCaptureBufferSize.TabIndex = 4;
@@ -96,7 +98,7 @@
             // labelAudioCaptureSizeValue
             // 
             this.labelAudioCaptureSizeValue.AutoSize = true;
-            this.labelAudioCaptureSizeValue.Location = new System.Drawing.Point(203, 82);
+            this.labelAudioCaptureSizeValue.Location = new System.Drawing.Point(203, 119);
             this.labelAudioCaptureSizeValue.Name = "labelAudioCaptureSizeValue";
             this.labelAudioCaptureSizeValue.Size = new System.Drawing.Size(54, 17);
             this.labelAudioCaptureSizeValue.TabIndex = 7;
@@ -116,7 +118,7 @@
             // labelEncoderBirate
             // 
             this.labelEncoderBirate.AutoSize = true;
-            this.labelEncoderBirate.Location = new System.Drawing.Point(12, 163);
+            this.labelEncoderBirate.Location = new System.Drawing.Point(12, 200);
             this.labelEncoderBirate.Name = "labelEncoderBirate";
             this.labelEncoderBirate.Size = new System.Drawing.Size(181, 17);
             this.labelEncoderBirate.TabIndex = 9;
@@ -125,7 +127,7 @@
             // labelEncoderBirateValue
             // 
             this.labelEncoderBirateValue.AutoSize = true;
-            this.labelEncoderBirateValue.Location = new System.Drawing.Point(199, 163);
+            this.labelEncoderBirateValue.Location = new System.Drawing.Point(199, 200);
             this.labelEncoderBirateValue.Name = "labelEncoderBirateValue";
             this.labelEncoderBirateValue.Size = new System.Drawing.Size(58, 17);
             this.labelEncoderBirateValue.TabIndex = 10;
@@ -134,7 +136,7 @@
             // labelContentType
             // 
             this.labelContentType.AutoSize = true;
-            this.labelContentType.Location = new System.Drawing.Point(12, 122);
+            this.labelContentType.Location = new System.Drawing.Point(12, 159);
             this.labelContentType.Name = "labelContentType";
             this.labelContentType.Size = new System.Drawing.Size(168, 17);
             this.labelContentType.TabIndex = 12;
@@ -143,7 +145,7 @@
             // labelPacketLoss
             // 
             this.labelPacketLoss.AutoSize = true;
-            this.labelPacketLoss.Location = new System.Drawing.Point(12, 208);
+            this.labelPacketLoss.Location = new System.Drawing.Point(12, 245);
             this.labelPacketLoss.Name = "labelPacketLoss";
             this.labelPacketLoss.Size = new System.Drawing.Size(80, 17);
             this.labelPacketLoss.TabIndex = 14;
@@ -152,7 +154,7 @@
             // labelPacketLossValue
             // 
             this.labelPacketLossValue.AutoSize = true;
-            this.labelPacketLossValue.Location = new System.Drawing.Point(202, 207);
+            this.labelPacketLossValue.Location = new System.Drawing.Point(202, 244);
             this.labelPacketLossValue.Name = "labelPacketLossValue";
             this.labelPacketLossValue.Size = new System.Drawing.Size(36, 17);
             this.labelPacketLossValue.TabIndex = 16;
@@ -161,7 +163,7 @@
             // labelStreamingBufferDuration
             // 
             this.labelStreamingBufferDuration.AutoSize = true;
-            this.labelStreamingBufferDuration.Location = new System.Drawing.Point(12, 248);
+            this.labelStreamingBufferDuration.Location = new System.Drawing.Point(12, 285);
             this.labelStreamingBufferDuration.Name = "labelStreamingBufferDuration";
             this.labelStreamingBufferDuration.Size = new System.Drawing.Size(169, 17);
             this.labelStreamingBufferDuration.TabIndex = 17;
@@ -170,11 +172,37 @@
             // labelStreamingBufferDurationValue
             // 
             this.labelStreamingBufferDurationValue.AutoSize = true;
-            this.labelStreamingBufferDurationValue.Location = new System.Drawing.Point(202, 248);
+            this.labelStreamingBufferDurationValue.Location = new System.Drawing.Point(202, 285);
             this.labelStreamingBufferDurationValue.Name = "labelStreamingBufferDurationValue";
             this.labelStreamingBufferDurationValue.Size = new System.Drawing.Size(62, 17);
             this.labelStreamingBufferDurationValue.TabIndex = 19;
             this.labelStreamingBufferDurationValue.Text = "1000 ms";
+            // 
+            // labelCaptureAPI
+            // 
+            this.labelCaptureAPI.AutoSize = true;
+            this.labelCaptureAPI.Location = new System.Drawing.Point(12, 79);
+            this.labelCaptureAPI.Name = "labelCaptureAPI";
+            this.labelCaptureAPI.Size = new System.Drawing.Size(83, 17);
+            this.labelCaptureAPI.TabIndex = 20;
+            this.labelCaptureAPI.Text = "Capture API";
+            // 
+            // comboBoxCaptureAPI
+            // 
+            this.comboBoxCaptureAPI.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::DiscordAudioStream.Properties.Settings.Default, "CaptureAPI", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.comboBoxCaptureAPI.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxCaptureAPI.FormattingEnabled = true;
+            this.comboBoxCaptureAPI.Items.AddRange(new object[] {
+            "MME",
+            "MME event",
+            "WASAPI shared",
+            "WASAPI exclusive",
+            "WASAPI loopback"});
+            this.comboBoxCaptureAPI.Location = new System.Drawing.Point(263, 76);
+            this.comboBoxCaptureAPI.Name = "comboBoxCaptureAPI";
+            this.comboBoxCaptureAPI.Size = new System.Drawing.Size(184, 24);
+            this.comboBoxCaptureAPI.TabIndex = 21;
+            this.comboBoxCaptureAPI.Text = global::DiscordAudioStream.Properties.Settings.Default.CaptureAPI;
             // 
             // trackBarStreamingBufferDuration
             // 
@@ -182,7 +210,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackBarStreamingBufferDuration.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::DiscordAudioStream.Properties.Settings.Default, "StreamingBufferDuration", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.trackBarStreamingBufferDuration.LargeChange = 100;
-            this.trackBarStreamingBufferDuration.Location = new System.Drawing.Point(263, 248);
+            this.trackBarStreamingBufferDuration.Location = new System.Drawing.Point(263, 285);
             this.trackBarStreamingBufferDuration.Maximum = 10000;
             this.trackBarStreamingBufferDuration.Minimum = 100;
             this.trackBarStreamingBufferDuration.Name = "trackBarStreamingBufferDuration";
@@ -198,7 +226,7 @@
             this.trackBarPacketLoss.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackBarPacketLoss.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::DiscordAudioStream.Properties.Settings.Default, "PacketLoss", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.trackBarPacketLoss.Location = new System.Drawing.Point(263, 197);
+            this.trackBarPacketLoss.Location = new System.Drawing.Point(263, 234);
             this.trackBarPacketLoss.Maximum = 100;
             this.trackBarPacketLoss.Name = "trackBarPacketLoss";
             this.trackBarPacketLoss.Size = new System.Drawing.Size(321, 56);
@@ -215,9 +243,9 @@
             "Mixed",
             "Voice",
             "Music"});
-            this.comboBoxContentType.Location = new System.Drawing.Point(263, 122);
+            this.comboBoxContentType.Location = new System.Drawing.Point(263, 159);
             this.comboBoxContentType.Name = "comboBoxContentType";
-            this.comboBoxContentType.Size = new System.Drawing.Size(121, 24);
+            this.comboBoxContentType.Size = new System.Drawing.Size(184, 24);
             this.comboBoxContentType.TabIndex = 13;
             this.comboBoxContentType.Text = global::DiscordAudioStream.Properties.Settings.Default.AudioContent;
             this.comboBoxContentType.TextChanged += new System.EventHandler(this.comboBoxContentType_TextChanged);
@@ -227,16 +255,17 @@
             this.trackBarEncoderBirate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackBarEncoderBirate.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::DiscordAudioStream.Properties.Settings.Default, "AudioBitrate", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.trackBarEncoderBirate.LargeChange = 16384;
-            this.trackBarEncoderBirate.Location = new System.Drawing.Point(263, 152);
-            this.trackBarEncoderBirate.Maximum = 131072;
-            this.trackBarEncoderBirate.Minimum = 16384;
+            this.trackBarEncoderBirate.LargeChange = 16;
+            this.trackBarEncoderBirate.Location = new System.Drawing.Point(263, 189);
+            this.trackBarEncoderBirate.Maximum = 128;
+            this.trackBarEncoderBirate.Minimum = 16;
             this.trackBarEncoderBirate.Name = "trackBarEncoderBirate";
             this.trackBarEncoderBirate.Size = new System.Drawing.Size(321, 56);
-            this.trackBarEncoderBirate.SmallChange = 8192;
+            this.trackBarEncoderBirate.SmallChange = 8;
             this.trackBarEncoderBirate.TabIndex = 11;
-            this.trackBarEncoderBirate.TickFrequency = 8192;
+            this.trackBarEncoderBirate.TickFrequency = 8;
             this.trackBarEncoderBirate.Value = global::DiscordAudioStream.Properties.Settings.Default.AudioBitrate;
+            this.trackBarEncoderBirate.Scroll += new System.EventHandler(this.trackBarEncoderBirate_Scroll);
             this.trackBarEncoderBirate.ValueChanged += new System.EventHandler(this.trackBarEncoderBirate_ValueChanged);
             // 
             // trackBarAudioCaptureBuffer
@@ -245,7 +274,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackBarAudioCaptureBuffer.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::DiscordAudioStream.Properties.Settings.Default, "AudioCaptureBufferMS", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.trackBarAudioCaptureBuffer.LargeChange = 20;
-            this.trackBarAudioCaptureBuffer.Location = new System.Drawing.Point(263, 70);
+            this.trackBarAudioCaptureBuffer.Location = new System.Drawing.Point(263, 107);
             this.trackBarAudioCaptureBuffer.Maximum = 1000;
             this.trackBarAudioCaptureBuffer.Minimum = 20;
             this.trackBarAudioCaptureBuffer.Name = "trackBarAudioCaptureBuffer";
@@ -272,7 +301,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(596, 371);
+            this.ClientSize = new System.Drawing.Size(596, 379);
+            this.Controls.Add(this.comboBoxCaptureAPI);
+            this.Controls.Add(this.labelCaptureAPI);
             this.Controls.Add(this.labelStreamingBufferDurationValue);
             this.Controls.Add(this.trackBarStreamingBufferDuration);
             this.Controls.Add(this.labelStreamingBufferDuration);
@@ -327,5 +358,7 @@
         private System.Windows.Forms.Label labelStreamingBufferDuration;
         private System.Windows.Forms.TrackBar trackBarStreamingBufferDuration;
         private System.Windows.Forms.Label labelStreamingBufferDurationValue;
+        private System.Windows.Forms.Label labelCaptureAPI;
+        private System.Windows.Forms.ComboBox comboBoxCaptureAPI;
     }
 }
