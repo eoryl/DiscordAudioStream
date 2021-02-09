@@ -53,9 +53,6 @@ namespace DiscordAudioStreamService
         private IWaveIn audioIn = null;
         private int captureBufferDuration;
         private string currentAudioDevice = "";
-        //private ConcurrentDictionary<string, int> audioDeviceNameToIDMap = new ConcurrentDictionary<string, int>();
-        //private CircularBuffer circularBuffer;
-        //private int circularBufferSize;
         private byte[] audioVisBuffer;
 
         // 
@@ -85,8 +82,8 @@ namespace DiscordAudioStreamService
             // https://opus-codec.org/comparison/
             // quality issue is most likely due to packet loss / jittering and discord 
             // putting forward low latency vs quality
-            audioBitrate = 96 * 1024;
-            packetLoss = 15;
+            audioBitrate = 128 * 1024;
+            packetLoss = 20;
             audioContent = AudioApplication.Music;
             // allocate buffer large enough for 100ms at 48khz 16bits stereo 
             audioTxBuffer = new byte[19200];
@@ -112,10 +109,11 @@ namespace DiscordAudioStreamService
         public static AudioAPI ParseAudioAPI(string api)
         {
             if (api == "MME") return AudioAPI.MME;
+            else if (api == "MME event") return AudioAPI.MME;
             else if (api == "WASAPI shared") return AudioAPI.WASAPI_Shared;
             else if (api == "WASAPI exclusive") return AudioAPI.WASAPI_Exclusive;
             else if (api == "WASAPI loopback") return AudioAPI.WASAPI_Loopback;
-            else return AudioAPI.MME_Event;
+            else return AudioAPI.MME;
         }
 
         private Task DiscordSocketClient_UserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3)
@@ -280,8 +278,17 @@ namespace DiscordAudioStreamService
                 if (currentServer.AudioClient != null)
                 {
                     //audioClient = currentServer.AudioClient;
-                    var stream = currentServer.AudioClient.CreatePCMStream(audioContent, audioBitrate, streamingBufferDuration, packetLoss);
-                    //var stream = client.CreatePCMStream(AudioApplication.Voice ,128000 );
+                    AudioOutStream stream = null;
+                    try
+                    {
+                        stream = currentServer.AudioClient.CreatePCMStream(audioContent, audioBitrate, streamingBufferDuration, packetLoss);
+                    }
+                    catch(Exception e)
+                    {
+                        Log("Failed to create AudioClient: " +e.Message );
+
+                    }
+                        //var stream = client.CreatePCMStream(AudioApplication.Voice ,128000 );
                     if (stream == null)
                     {
                         Log("Unable to create output stream");
@@ -858,7 +865,7 @@ namespace DiscordAudioStreamService
                         }
                         catch(Exception e)
                         {
-                            System.Console.WriteLine("Failed to update status: " + e.Message);
+                            Log("Failed to update status: " + e.Message);
                         }
                     }
                     if (byteCount % 3840 != 0)

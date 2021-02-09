@@ -30,7 +30,6 @@ namespace DiscordAudioStream
         ICollection<AudioCaptureDeviceInfo> AudioDevices { get; set; }
         string SelectedAudioDeviceID { get; set; }
         event EventHandler<string> SelectedAudioDeviceIDChanged;
-        event EventHandler ViewRefreshRequested;
         void DisplayErrorMessage(string errorMessage);
 
     }

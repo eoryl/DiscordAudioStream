@@ -98,5 +98,10 @@ namespace DiscordAudioStream
         {
             this.Close();
         }
+
+        private void linkLabelgithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/eoryl/DiscordAudioStream/");            
+        }
     }
 }

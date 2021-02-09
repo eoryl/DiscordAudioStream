@@ -29,13 +29,14 @@
         {
             this.buttonOK = new System.Windows.Forms.Button();
             this.labelProductName = new System.Windows.Forms.Label();
+            this.linkLabelgithub = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonOK.Location = new System.Drawing.Point(284, 68);
+            this.buttonOK.Location = new System.Drawing.Point(284, 93);
             this.buttonOK.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(100, 27);
@@ -55,15 +56,27 @@
             this.labelProductName.Text = "Product Name";
             this.labelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // linkLabelgithub
+            // 
+            this.linkLabelgithub.AutoSize = true;
+            this.linkLabelgithub.Location = new System.Drawing.Point(15, 69);
+            this.linkLabelgithub.Name = "linkLabelgithub";
+            this.linkLabelgithub.Size = new System.Drawing.Size(292, 17);
+            this.linkLabelgithub.TabIndex = 26;
+            this.linkLabelgithub.TabStop = true;
+            this.linkLabelgithub.Text = "https://github.com/eoryl/DiscordAudioStream/";
+            this.linkLabelgithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelgithub_LinkClicked);
+            // 
             // AboutBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(396, 110);
+            this.ClientSize = new System.Drawing.Size(396, 135);
+            this.Controls.Add(this.linkLabelgithub);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.labelProductName);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutBox";
@@ -73,11 +86,13 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "DiscordAudioStream";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Label labelProductName;
+        private System.Windows.Forms.LinkLabel linkLabelgithub;
     }
 }

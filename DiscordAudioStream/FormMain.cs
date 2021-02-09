@@ -193,7 +193,7 @@ namespace DiscordAudioStream
         public event EventHandler<string> DiscordBotTokenChanged;
         public event EventHandler<string> AudioContentChanged;
         public event EventHandler<int> AudioBitrateChanged;
-        public event EventHandler ViewRefreshRequested;
+
 
         private void FormMain_Load(object sender, EventArgs e)
         {
