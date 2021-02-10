@@ -1,5 +1,5 @@
 # DiscordAudioStream
-A simple audio streaming tool for Discord based on Discord.net and NAudio to play some higher quality audio via a secondary Discord bot type connection on an audio channel. The application works best in conjunction with a dedicated virtual audio soundcard.
+A simple tool for Windows to stream audio on Discord: play higher quality audio to a voice channel via a secondary Discord bot type connection. The application based on Discord.net and NAudio, and is designed for Windows. It works best in conjunction with a dedicated virtual audio soundcard.
 
 # Use cases
 It's initial purpose is to be used to play ambiant sound and music for virtual table top sessions on Discord. 
@@ -72,6 +72,10 @@ Check the setup instructions prerequisites.
 * *But I installed them and it was working before!*
 
 Maybe something isn't right in the config. Just delete %APPDATA%\Local\DiscordAudioStream (C:\Users\<username>\AppData\Local\DiscordAudioStream) and reset your bot token and other params.
+
+* *What Operating Systems support?*
+
+Only tested on up to date Windows 10 64bit. Althought it should work on Windows 10 32bit as the app runs in 32 bit mode. Windows 7 should also be supported as well but is untested. 
 
 # Compiling
 Compilation should work without tinkering using visual studio 2019 with .Net desktop development workload. 
