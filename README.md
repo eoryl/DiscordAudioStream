@@ -46,6 +46,10 @@ Once you have created the bot and its token you must add it to your server and g
 
 The most compatible mode is probably MME. The most performant is WASAPI but it requires settings the device sample rate to 48kHz (see above).
 
+* *I get an error about sampling rate when I select my card*
+
+That's because you are in WASAPI mode. Discord expcets 48kHz audio and  there is no real time sample rate conversion in that mode. In Windows go to  Settings > Sounds > Sound Control Pannel > Recording|Playback > your card endpoint > Properties > Advanced and set  48khz (ideally 16bit stereo). If your card does't support it switch to MME.
+
 * *What are compatibility parameters?*
 
 MME capture mode, 100ms capture buffer, Mixed content, 96kbps, 15% packet loss, 1000 ms network buffer. 
@@ -70,7 +74,7 @@ Check the setup instructions prerequisites.
 
 Maybe something isn't right in the config. Just delete %APPDATA%\Local\DiscordAudioStream (C:\Users\<username>\AppData\Local\DiscordAudioStream) and reset your bot token and other params.
 
-* *What about Operating Systems support?*
+* *What about supported Operating Systems?*
 
 Only tested on up to date Windows 10 64bit. Althought it should work on Windows 10 32bit as the app runs in 32 bit mode. Windows 7 should also be supported as well but is untested. 
 
