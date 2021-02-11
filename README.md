@@ -73,7 +73,7 @@ Check the setup instructions prerequisites.
 
 Maybe something isn't right in the config. Just delete %APPDATA%\Local\DiscordAudioStream (C:\Users\<username>\AppData\Local\DiscordAudioStream) and reset your bot token and other params.
 
-* *What Operating Systems support?*
+* *What about Operating Systems support?*
 
 Only tested on up to date Windows 10 64bit. Althought it should work on Windows 10 32bit as the app runs in 32 bit mode. Windows 7 should also be supported as well but is untested. 
 
