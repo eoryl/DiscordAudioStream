@@ -1,5 +1,5 @@
 # DiscordAudioStream
-A simple audio streaming tool for Discord based on Discord.net and NAudio to play some higher quality audio via a secondary Discord bot type connection on an audio channel. The application works best in conjunction with a dedicated virtual audio soundcard.
+A simple tool for Windows to stream audio on Discord: play higher quality audio to a voice channel via a secondary Discord bot type connection. The application based on Discord.net and NAudio, and is designed for Windows. It works best in conjunction with a dedicated virtual audio soundcard.
 
 # Use cases
 It's initial purpose is to be used to play ambiant sound and music for virtual table top sessions on Discord. 
@@ -11,8 +11,10 @@ It's initial purpose is to be used to play ambiant sound and music for virtual t
 * To avoid using analogue loop (or WASAPI loopback), install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
 * If using WASAPI capture set the virtual audio card is set to 48khz 16bit stereo in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is optional but recommended if using MME. You should also use 48khz for playback in Settings > Sounds > Sound Control Pannel > Playback > Cable input > Properties > Advanced, and in your playout application (audio clips and output).This is to avoid unecessary resampling and dithering along the chain because Discord expects 48kHz audio.
 * The audio is played by the selected audio applications through the virtual audio cable. Route either in the app itself or using Windows 10 routing interface in Settings > Sounds >  Advanced Sound Options > App volume and device preferences 
-* Get a discord bot token at https://discordapp.com/developers/applications (you can find a better in depth tutorial here on how to create a bot https://discord.foxbot.me/docs/guides/getting_started/first-bot.html)
-* Add the bot to your server https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=36701184&scope=bot I have tried to limit so necessary permissions only to do audio, just replace YOUR_BOT_ID_HERE with your actual bot client ID
+* Get a discord bot token at https://discordapp.com/developers/applications (you can find a better in depth tutorial here on how to create a bot https://docs.stillu.cc/guides/getting_started/first-bot.html)
+  * Create an application
+  * Then in your application go to bot and "Add bot" (tick public if you intended to add it on someone else's server)
+  * Add the bot to your server https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=36701184&scope=bot I have tried to limit so necessary permissions only to do audio, just replace YOUR_BOT_ID_HERE with your actual bot client ID
 * Run DiscordAudioStream in File > Settings enter your bot token and exit
 * Run DiscordAudioStream again the application should connect the status should go to green / idle and the bot connect to the voice channel
 * Select the virtual audio cable as a source, the server and the voice channel.
@@ -70,6 +72,10 @@ Check the setup instructions prerequisites.
 * *But I installed them and it was working before!*
 
 Maybe something isn't right in the config. Just delete %APPDATA%\Local\DiscordAudioStream (C:\Users\<username>\AppData\Local\DiscordAudioStream) and reset your bot token and other params.
+
+* *What Operating Systems support?*
+
+Only tested on up to date Windows 10 64bit. Althought it should work on Windows 10 32bit as the app runs in 32 bit mode. Windows 7 should also be supported as well but is untested. 
 
 # Compiling
 Compilation should work without tinkering using visual studio 2019 with .Net desktop development workload. 
