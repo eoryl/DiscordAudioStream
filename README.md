@@ -88,6 +88,10 @@ Visual studio should resolve all for you.
 
 After compilation add the dependencies dlls (32bit version) opus.dll and libsodium.dll in the bin/[profile] folder
 
+If you want to recompile them as well instead of using the provided ones, source code is available on their respective website:
+* https://opus-codec.org/
+* https://doc.libsodium.org/
+
 # Alternatives 
 * The initial idea from Rollyjumper as bot in Rust https://github.com/Rollyjumper/fp_music_bot
 * A similar tool written in Python https://github.com/QiCuiHub/discord-audio-pipe/
