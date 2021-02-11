@@ -49,7 +49,7 @@ namespace DiscordAudioStream.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Mixed")]
         public string AudioContent {
             get {
                 return ((string)(this["AudioContent"]));
@@ -109,7 +109,7 @@ namespace DiscordAudioStream.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("MME")]
         public string CaptureAPI {
             get {
                 return ((string)(this["CaptureAPI"]));
