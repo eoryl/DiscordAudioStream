@@ -103,6 +103,16 @@ namespace DiscordAudioStream.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icon_reveal_small {
+            get {
+                object obj = ResourceManager.GetObject("icon_reveal_small", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icon_streaming {
             get {
                 object obj = ResourceManager.GetObject("icon_streaming", resourceCulture);

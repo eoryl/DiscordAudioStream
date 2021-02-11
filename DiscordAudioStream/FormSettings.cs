@@ -79,5 +79,10 @@ namespace DiscordAudioStream
         {
 
         }
+
+        private void labelDiscordBotToken_Click(object sender, EventArgs e)
+        {
+            textBoxDiscordBotToken.UseSystemPasswordChar = !textBoxDiscordBotToken.UseSystemPasswordChar;
+        }
     }
 }

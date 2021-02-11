@@ -30,6 +30,7 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.labelProductName = new System.Windows.Forms.Label();
             this.linkLabelgithub = new System.Windows.Forms.LinkLabel();
+            this.labelCopyright = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -67,11 +68,21 @@
             this.linkLabelgithub.Text = "https://github.com/eoryl/DiscordAudioStream/";
             this.linkLabelgithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelgithub_LinkClicked);
             // 
+            // labelCopyright
+            // 
+            this.labelCopyright.AutoSize = true;
+            this.labelCopyright.Location = new System.Drawing.Point(15, 41);
+            this.labelCopyright.Name = "labelCopyright";
+            this.labelCopyright.Size = new System.Drawing.Size(68, 17);
+            this.labelCopyright.TabIndex = 27;
+            this.labelCopyright.Text = "Copyright";
+            // 
             // AboutBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(396, 135);
+            this.Controls.Add(this.labelCopyright);
             this.Controls.Add(this.linkLabelgithub);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.labelProductName);
@@ -85,6 +96,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "DiscordAudioStream";
+            this.Load += new System.EventHandler(this.AboutBox_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -94,5 +106,6 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Label labelProductName;
         private System.Windows.Forms.LinkLabel linkLabelgithub;
+        private System.Windows.Forms.Label labelCopyright;
     }
 }

@@ -99,18 +99,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -137,6 +137,7 @@
     <Content Include="Icons\icon-question-mark.png" />
     <Content Include="Icons\icon-check-blue.png" />
     <Content Include="Icons\icon-cross.png" />
+    <None Include="Icons\icon_reveal_small.png" />
     <Content Include="Icons\speaker-sound-audio-icon-256-big_32.ico" />
     <Content Include="Licences\flaticon.txt" />
     <Content Include="Licences\Discord.net.txt" />
@@ -144,6 +145,7 @@
     <Content Include="Licences\libsodium.txt" />
     <Content Include="Licences\NAudio.txt" />
     <Content Include="Licences\PeakLimiter.txt" />
+    <None Include="Resources\icon_reveal.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DiscordAudioStreamService\DiscordAudioStreamService.csproj">

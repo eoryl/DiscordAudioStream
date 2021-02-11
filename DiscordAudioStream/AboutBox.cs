@@ -11,6 +11,7 @@ namespace DiscordAudioStream
             InitializeComponent();
             this.Text = String.Format("About {0}", AssemblyTitle);
             this.labelProductName.Text = String.Format("{0} Version {1}", AssemblyTitle, AssemblyVersion);
+            this.labelCopyright.Text = AssemblyCopyright + " See licences for additional info.";
 
         }
 
@@ -102,6 +103,11 @@ namespace DiscordAudioStream
         private void linkLabelgithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/eoryl/DiscordAudioStream/");            
+        }
+
+        private void AboutBox_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -63,11 +63,12 @@
             this.labelDiscordBotToken.Size = new System.Drawing.Size(68, 17);
             this.labelDiscordBotToken.TabIndex = 0;
             this.labelDiscordBotToken.Text = "Bot token";
+            this.labelDiscordBotToken.Click += new System.EventHandler(this.labelDiscordBotToken_Click);
             // 
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(428, 344);
+            this.buttonOK.Location = new System.Drawing.Point(430, 344);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 2;
@@ -78,7 +79,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.Location = new System.Drawing.Point(509, 344);
+            this.buttonCancel.Location = new System.Drawing.Point(511, 344);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 3;
@@ -214,7 +215,7 @@
             this.trackBarStreamingBufferDuration.Maximum = 10000;
             this.trackBarStreamingBufferDuration.Minimum = 100;
             this.trackBarStreamingBufferDuration.Name = "trackBarStreamingBufferDuration";
-            this.trackBarStreamingBufferDuration.Size = new System.Drawing.Size(321, 56);
+            this.trackBarStreamingBufferDuration.Size = new System.Drawing.Size(323, 56);
             this.trackBarStreamingBufferDuration.SmallChange = 20;
             this.trackBarStreamingBufferDuration.TabIndex = 18;
             this.trackBarStreamingBufferDuration.TickFrequency = 20;
@@ -229,7 +230,7 @@
             this.trackBarPacketLoss.Location = new System.Drawing.Point(263, 234);
             this.trackBarPacketLoss.Maximum = 100;
             this.trackBarPacketLoss.Name = "trackBarPacketLoss";
-            this.trackBarPacketLoss.Size = new System.Drawing.Size(321, 56);
+            this.trackBarPacketLoss.Size = new System.Drawing.Size(323, 56);
             this.trackBarPacketLoss.TabIndex = 15;
             this.trackBarPacketLoss.Value = global::DiscordAudioStream.Properties.Settings.Default.PacketLoss;
             this.trackBarPacketLoss.ValueChanged += new System.EventHandler(this.trackBarPacketLoss_ValueChanged);
@@ -260,7 +261,7 @@
             this.trackBarEncoderBirate.Maximum = 128;
             this.trackBarEncoderBirate.Minimum = 16;
             this.trackBarEncoderBirate.Name = "trackBarEncoderBirate";
-            this.trackBarEncoderBirate.Size = new System.Drawing.Size(321, 56);
+            this.trackBarEncoderBirate.Size = new System.Drawing.Size(323, 56);
             this.trackBarEncoderBirate.SmallChange = 8;
             this.trackBarEncoderBirate.TabIndex = 11;
             this.trackBarEncoderBirate.TickFrequency = 8;
@@ -278,7 +279,7 @@
             this.trackBarAudioCaptureBuffer.Maximum = 1000;
             this.trackBarAudioCaptureBuffer.Minimum = 20;
             this.trackBarAudioCaptureBuffer.Name = "trackBarAudioCaptureBuffer";
-            this.trackBarAudioCaptureBuffer.Size = new System.Drawing.Size(321, 56);
+            this.trackBarAudioCaptureBuffer.Size = new System.Drawing.Size(323, 56);
             this.trackBarAudioCaptureBuffer.SmallChange = 10;
             this.trackBarAudioCaptureBuffer.TabIndex = 6;
             this.trackBarAudioCaptureBuffer.TickFrequency = 20;
@@ -293,15 +294,17 @@
             this.textBoxDiscordBotToken.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::DiscordAudioStream.Properties.Settings.Default, "DiscordBotToken", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBoxDiscordBotToken.Location = new System.Drawing.Point(83, 13);
             this.textBoxDiscordBotToken.Name = "textBoxDiscordBotToken";
-            this.textBoxDiscordBotToken.Size = new System.Drawing.Size(501, 22);
+            this.textBoxDiscordBotToken.Size = new System.Drawing.Size(503, 22);
             this.textBoxDiscordBotToken.TabIndex = 1;
             this.textBoxDiscordBotToken.Text = global::DiscordAudioStream.Properties.Settings.Default.DiscordBotToken;
+            this.textBoxDiscordBotToken.UseSystemPasswordChar = true;
             // 
             // FormSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(596, 379);
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.ClientSize = new System.Drawing.Size(598, 379);
             this.Controls.Add(this.comboBoxCaptureAPI);
             this.Controls.Add(this.labelCaptureAPI);
             this.Controls.Add(this.labelStreamingBufferDurationValue);

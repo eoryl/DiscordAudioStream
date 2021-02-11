@@ -9,7 +9,7 @@
       <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="AudioContent" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Mixed</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LogLevel" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -24,7 +24,7 @@
       <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="CaptureAPI" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MME</Value>
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

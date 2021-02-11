@@ -753,6 +753,18 @@ namespace DiscordAudioStreamService
                     Log("No device available for capture");
                     return;
                 }
+
+                if ((audioCaptureAPI == AudioAPI.WASAPI_Exclusive) || (audioCaptureAPI == AudioAPI.WASAPI_Shared) || (audioCaptureAPI == AudioAPI.WASAPI_Loopback))
+                {
+                    if (audioIn.WaveFormat.SampleRate != 48000)
+                    {
+                        Log("WASAPI capture invalid sampling rate.");
+                        AudioCaptureView.DisplayErrorMessage("Invalid sampling rate for WASAPI capture. Set device to 48000Hz or switch MME.");
+                        audioIn = null;
+                        return;
+                    }
+                }
+
                 audioIn.DataAvailable += Audioin_DataAvailable;
                 audioIn.RecordingStopped += Audioin_RecordingStopped;
 
