@@ -3,7 +3,7 @@ A simple tool for Windows to stream audio on Discord: play higher quality audio 
 
 # Setup
 * Get latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
-* DiscordAudioStream and its dependicies require .NET 4.6.1 runtime. If you are running on Windows 10 up to date you should have the correct version of .Net runtime. If not or running Windows 7 install .NET 4.6.1 runtime or a later .NET 4 framework. .NET framework 4.6.1 can be found here https://www.microsoft.com/en-us/download/details.aspx?id=49981
+* DiscordAudioStream and its dependicies require at least .NET 4.7.2 (older versions could run on 4.6.1). If you are running on Windows 10 up to date you should have the correct version of .Net runtime. If not or running Windows 7 install at .NET 4.7.2 runtime or preferably the lastest .NET 4.x framework. .NET installers can be found here https://www.microsoft.com/en-us/download/details.aspx?id=49981
 * Install Visual C++ 2019 x86 redist from here https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 * To avoid using analogue loop (or WASAPI loopback), install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
 * If using WASAPI capture set the virtual audio card is set to 48khz 16bit stereo in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is optional but recommended if using MME. You should also use 48khz for playback in Settings > Sounds > Sound Control Pannel > Playback > Cable input > Properties > Advanced, and in your playout application (audio clips and output).This is to avoid unecessary resampling and dithering along the chain because Discord expects 48kHz audio.
