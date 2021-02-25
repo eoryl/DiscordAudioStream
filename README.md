@@ -5,8 +5,8 @@ A simple tool for Windows to stream audio on Discord: play higher quality audio 
 * Get latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
 * DiscordAudioStream and its dependicies require at least .NET 4.7.2 (older versions could run on 4.6.1). If you are running on Windows 10 up to date you should have the correct version of .Net runtime. If not or running Windows 7 install at least .NET 4.7.2 runtime or preferably the lastest .NET 4.x framework runtime available for your platform. .NET runtime installers can be found here https://dotnet.microsoft.com/download/dotnet-framework
 * Install Visual C++ 2019 x86 redist from here https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
-* To avoid using analogue loop (or WASAPI loopback), install a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/
-* If using WASAPI capture set the virtual audio card is set to 48khz 16bit stereo in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is optional but recommended if using MME. You should also use 48khz for playback in Settings > Sounds > Sound Control Pannel > Playback > Cable input > Properties > Advanced, and in your playout application (audio clips and output).This is to avoid unecessary resampling and dithering along the chain because Discord expects 48kHz audio.
+* A soundcard. The simplest method is to use a virtual audio cable virtual audio card driver. I tested with this one https://www.vb-audio.com/Cable/, but you can also use anycard output with WASAPI loopback (just make sure you use a different card for Discord if you connect to the same channel to avoid feedback).
+* If using WASAPI capture set the virtual audio card is set to 48khz 16bit stereo in Settings > Sounds > Sound Control Pannel > Recording > Cable output > Properties > Advanced. This is optional but recommended if using MME. You should use 48khz for playback in Settings > Sounds > Sound Control Pannel > Playback > Cable input > Properties > Advanced, and in your playout application (audio clips and output).This is also optional but it avoids unecessary resampling and dithering along the chain because Discord expects 48kHz audio.
 * The audio is played by the selected audio applications through the virtual audio cable. Route either in the app itself or using Windows 10 routing interface in Settings > Sounds >  Advanced Sound Options > App volume and device preferences 
 * Get a discord bot token at https://discordapp.com/developers/applications (you can find a better in depth tutorial here on how to create a bot https://docs.stillu.cc/guides/getting_started/first-bot.html)
   * Create an application
@@ -69,6 +69,10 @@ There are no file based logs at the moment but you can get some logs with debugv
 * *The app crashes at startup*
 
 Check the setup instructions prerequisites.
+
+* *The app freezes when I connect to a voice channl*
+
+Check the setup instructions prerequisites. More specifically Visual C++ redist.
 
 * *But I installed them and it was working before!*
 
