@@ -68,11 +68,11 @@ There are no file based logs at the moment but you can get some logs with debugv
 
 * *The app crashes at startup*
 
-Check the setup instructions prerequisites.
+Check the setup instructions about prerequisites.
 
-* *The app freezes when I connect to a voice channl*
+* *The app freezes when I connect to a voice channel*
 
-Check the setup instructions prerequisites. More specifically Visual C++ 2019 x86 redist.
+Check the setup instructions about prerequisites. More specifically Visual C++ 2019 x86 redist. That's when  libsodium and opus.dll are used they are the ones that depend on the VC++ redist.
 
 * *But I installed them and it was working before!*
 
