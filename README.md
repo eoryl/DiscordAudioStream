@@ -76,7 +76,7 @@ Check the setup instructions about prerequisites. More specifically Visual C++ 2
 
 * *But I installed them and it was working before!*
 
-Maybe something isn't right in the config. Just delete %APPDATA%\Local\DiscordAudioStream (C:\Users\<username>\AppData\Local\DiscordAudioStream) and reset your bot token and other params.
+Maybe something isn't right in the config. Just delete %APPDATA%\Local\DiscordAudioStream (C:\Users\\\<username>\AppData\Local\DiscordAudioStream) and reset your bot token and other params.
 
 * *What about supported Operating Systems?*
 
