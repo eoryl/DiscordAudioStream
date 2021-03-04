@@ -9,7 +9,7 @@ A simple tool for Windows to stream audio on Discord: stream what you are playin
 * Get a discord bot token at https://discordapp.com/developers/applications (you can find a better in depth tutorial here on how to create a bot https://docs.stillu.cc/guides/getting_started/first-bot.html)
   * Create an application
   * Then in your application go to bot and "Add bot" (tick public if you intend to add it on someone else's server)
-  * Add the bot to your server https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=3145728&scope=bot I have tried to limit so necessary permissions only to do audio, just replace YOUR_BOT_ID_HERE with your actual bot client ID
+  * Add the bot to your server https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=3145728&scope=bot I have tried to limit to necessary permissions only to do audio, just replace YOUR_BOT_ID_HERE with your actual bot client ID
 * Run DiscordAudioStream in File > Settings enter your bot token and exit
 * Run DiscordAudioStream again the application should connect the status should go to green / idle and the bot connect to the voice channel
 * Select your audio device endpoint. If using Virtual Audio Cable and default settings thats "CABLE OUTPUT (VB-Audio Virtual". The meter should move when you play audio via the selected audio device. 
