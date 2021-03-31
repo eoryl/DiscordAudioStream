@@ -110,10 +110,10 @@
             this.linkLabelBotTokenURL.AutoSize = true;
             this.linkLabelBotTokenURL.Location = new System.Drawing.Point(12, 44);
             this.linkLabelBotTokenURL.Name = "linkLabelBotTokenURL";
-            this.linkLabelBotTokenURL.Size = new System.Drawing.Size(426, 17);
+            this.linkLabelBotTokenURL.Size = new System.Drawing.Size(422, 17);
             this.linkLabelBotTokenURL.TabIndex = 8;
             this.linkLabelBotTokenURL.TabStop = true;
-            this.linkLabelBotTokenURL.Text = "Get a bot token on https://discordapp.com/developers/applications";
+            this.linkLabelBotTokenURL.Text = "Get a bot token at https://discordapp.com/developers/applications";
             this.linkLabelBotTokenURL.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelBotTokenURL_LinkClicked);
             // 
             // labelEncoderBirate
@@ -121,9 +121,9 @@
             this.labelEncoderBirate.AutoSize = true;
             this.labelEncoderBirate.Location = new System.Drawing.Point(12, 200);
             this.labelEncoderBirate.Name = "labelEncoderBirate";
-            this.labelEncoderBirate.Size = new System.Drawing.Size(181, 17);
+            this.labelEncoderBirate.Size = new System.Drawing.Size(144, 17);
             this.labelEncoderBirate.TabIndex = 9;
-            this.labelEncoderBirate.Text = "Opus audio encoder bitrate";
+            this.labelEncoderBirate.Text = "Audio encoder bitrate";
             // 
             // labelEncoderBirateValue
             // 
@@ -139,18 +139,18 @@
             this.labelContentType.AutoSize = true;
             this.labelContentType.Location = new System.Drawing.Point(12, 159);
             this.labelContentType.Name = "labelContentType";
-            this.labelContentType.Size = new System.Drawing.Size(168, 17);
+            this.labelContentType.Size = new System.Drawing.Size(126, 17);
             this.labelContentType.TabIndex = 12;
-            this.labelContentType.Text = "Audio codec content type";
+            this.labelContentType.Text = "Audio content type";
             // 
             // labelPacketLoss
             // 
             this.labelPacketLoss.AutoSize = true;
             this.labelPacketLoss.Location = new System.Drawing.Point(12, 245);
             this.labelPacketLoss.Name = "labelPacketLoss";
-            this.labelPacketLoss.Size = new System.Drawing.Size(80, 17);
+            this.labelPacketLoss.Size = new System.Drawing.Size(118, 17);
             this.labelPacketLoss.TabIndex = 14;
-            this.labelPacketLoss.Text = "Packet loss";
+            this.labelPacketLoss.Text = "Packet loss / FEC";
             // 
             // labelPacketLossValue
             // 
@@ -166,9 +166,9 @@
             this.labelStreamingBufferDuration.AutoSize = true;
             this.labelStreamingBufferDuration.Location = new System.Drawing.Point(12, 285);
             this.labelStreamingBufferDuration.Name = "labelStreamingBufferDuration";
-            this.labelStreamingBufferDuration.Size = new System.Drawing.Size(169, 17);
+            this.labelStreamingBufferDuration.Size = new System.Drawing.Size(129, 17);
             this.labelStreamingBufferDuration.TabIndex = 17;
-            this.labelStreamingBufferDuration.Text = "Streaming buffer duration";
+            this.labelStreamingBufferDuration.Text = "Network buffer size";
             // 
             // labelStreamingBufferDurationValue
             // 

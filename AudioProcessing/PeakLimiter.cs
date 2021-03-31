@@ -39,9 +39,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace DiscordAudioStreamService
+namespace AudioProcessing
 {
-    unsafe class PeakLimiter
+    unsafe public class PeakLimiter
     {
 
         public int m_attack;
@@ -123,7 +123,7 @@ namespace DiscordAudioStreamService
         public static extern IntPtr memcpy(IntPtr dest, IntPtr src, int count);
 
         /* create limiter */
-        PeakLimiter(
+       public  PeakLimiter(
             float maxAttackMsIn,
             float releaseMsIn,
             float thresholdIn,
@@ -199,7 +199,7 @@ namespace DiscordAudioStreamService
         }
 
         /* reset limiter */
-        int resetLimiter()
+        public int resetLimiter()
         {
 
             m_maxBufferIndex = 0;
@@ -224,7 +224,7 @@ namespace DiscordAudioStreamService
 
 
         /* destroy limiter */
-        int destroyLimiter()
+        public int destroyLimiter()
         {
             if (m_pMaxBuffer != (float*)IntPtr.Zero)
             {
@@ -250,14 +250,14 @@ namespace DiscordAudioStreamService
         }
 
         /* apply limiter */
-        int applyLimiter_E(float* samplesIn, float* samplesOut, int nSamples)
+        public int applyLimiter_E(float* samplesIn, float* samplesOut, int nSamples)
         {
             memcpy((IntPtr) samplesOut, (IntPtr)samplesIn, nSamples * sizeof(float));
             return applyLimiter_E_I(samplesOut, nSamples);
         }
 
         /* apply limiter */
-        int applyLimiter_E_I(float* samples, int nSamples)
+        public int applyLimiter_E_I(float* samples, int nSamples)
         {
             int i, j;
             float tmp, gain, maximum;
@@ -419,7 +419,7 @@ namespace DiscordAudioStreamService
         }
 
         /* apply limiter */
-        int applyLimiter(float** samplesIn, float** samplesOut, int nSamples)
+        public int applyLimiter(float** samplesIn, float** samplesOut, int nSamples)
         {
             int ind;
             for (ind = 0; ind < m_channels; ind++)
@@ -431,7 +431,7 @@ namespace DiscordAudioStreamService
 
 
         /* apply limiter */
-        int applyLimiter_I(float** samples, int nSamples)
+        public int applyLimiter_I(float** samples, int nSamples)
         {
             int i, j;
             float tmp, gain, maximum;
@@ -594,37 +594,37 @@ namespace DiscordAudioStreamService
         }
 
         /* get delay in samples */
-        int getLimiterDelay()
+        public int getLimiterDelay()
         {
             return m_attack;
         }
 
         /* get m_attack in Ms */
-        float getLimiterAttack()
+        public float getLimiterAttack()
         {
             return m_attackMs;
         }
 
         /* get delay in samples */
-        int getLimiterSampleRate()
+        public int getLimiterSampleRate()
         {
             return m_sampleRate;
         }
 
         /* get delay in samples */
-        float getLimiterRelease()
+        public float getLimiterRelease()
         {
             return m_releaseMs;
         }
 
         /* get maximum gain reduction of last processed block */
-        float getLimiterMaxGainReduction()
+        public float getLimiterMaxGainReduction()
         {
             return -20 * (float)log10(m_smoothState);
         }
 
         /* set number of channels */
-        int setLimiterNChannels(int nChannelsIn)
+        public int setLimiterNChannels(int nChannelsIn)
         {
             if (nChannelsIn > m_maxChannels) return LIMITER_INVALID_PARAMETER;
 
@@ -635,7 +635,7 @@ namespace DiscordAudioStreamService
         }
 
         /* set sampling rate */
-        int setLimiterSampleRate(int sampleRateIn)
+        public int setLimiterSampleRate(int sampleRateIn)
         {
             if (sampleRateIn > m_maxSampleRate) return LIMITER_INVALID_PARAMETER;
 
@@ -662,7 +662,7 @@ namespace DiscordAudioStreamService
         }
 
         /* set m_attack time */
-        int setLimiterAttack(float attackMsIn)
+        public int setLimiterAttack(float attackMsIn)
         {
             if (attackMsIn > m_maxAttackMs) return LIMITER_INVALID_PARAMETER;
 
@@ -688,7 +688,7 @@ namespace DiscordAudioStreamService
         }
 
         /* set release time */
-        int setLimiterRelease(float releaseMsIn)
+        public int setLimiterRelease(float releaseMsIn)
         {
             m_releaseConst = (float)pow(0.1, 1.0 / (releaseMsIn * m_sampleRate / 1000 + 1));
             m_releaseMs = releaseMsIn;
@@ -697,7 +697,7 @@ namespace DiscordAudioStreamService
         }
 
         /* set limiter threshold */
-        int setLimiterThreshold(float thresholdIn)
+        public int setLimiterThreshold(float thresholdIn)
         {
             m_threshold = thresholdIn;
 
@@ -705,7 +705,7 @@ namespace DiscordAudioStreamService
         }
 
         /* set limiter threshold */
-        float getLimiterThreshold()
+        public float getLimiterThreshold()
         {
             return m_threshold;
         }

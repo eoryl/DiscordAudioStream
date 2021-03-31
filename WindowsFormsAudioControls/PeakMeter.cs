@@ -40,9 +40,13 @@ namespace DiscordAudioStream
         public float Level { get => level; 
             set 
             { 
-                this.level = value;
-                this.UpdatePeak();
-                this.Refresh();
+                if (this.level != value)
+                {
+                    this.level = value;
+                    this.UpdatePeak();
+                    //this.Invalidate();
+                    //this.Refresh();
+                }
             }
         }
         public float ClipLevel { get => clipLevel; set => clipLevel = (value > 0.0f ? 0.0f : value); }
@@ -97,6 +101,7 @@ namespace DiscordAudioStream
                     peakLevelTime = now;
                 }
             }
+            this.Invalidate();
         }
 
         private int ScaleDBFsToInt(float dbFSVal, int maxIntVal)

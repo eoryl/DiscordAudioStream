@@ -17,6 +17,12 @@ namespace DiscordAudioStream
         private bool updatingServerList = false;
         private bool updatingChannelList = false;
 
+        private volatile float peakL = -144.0f;
+        private volatile float peakR = -144.0f;
+        private volatile StatusColourCode statusColourCode = StatusColourCode.Red;
+        private string statusMessage = "";
+        private Object updateLock = new Object();
+
         public FormMain()
         {
             InitializeComponent();
@@ -40,10 +46,14 @@ namespace DiscordAudioStream
                                     {
                                         if (statusStripMain.Items["toolStripStatusLabelMessage"].Text != value)
                                             statusStripMain.Items["toolStripStatusLabelMessage"].Text = value;
-                                    }
+                }
                                 }
                                 )
                         );
+                    lock (updateLock)
+                    {
+                        statusMessage = value;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -52,11 +62,11 @@ namespace DiscordAudioStream
             }
         }
 
-        ICollection<string> IDiscordConnectionView.Servers
+        ICollection<DiscordServerInfo> IDiscordConnectionView.Servers
         {
             get
             {
-                return new List<string>(this.comboBoxDiscordServer.Items.Cast<string>());
+                return (List<DiscordServerInfo>) comboBoxDiscordServer.DataSource;
             }
             set
             {
@@ -68,16 +78,21 @@ namespace DiscordAudioStream
                         {
                             updatingServerList = true;
 
-                            string oldServer = comboBoxDiscordServer.Text;
+                            ulong oldServer = 0;
+                            if (comboBoxDiscordServer.SelectedValue != null) oldServer =  (ulong) comboBoxDiscordServer.SelectedValue;
+                            comboBoxDiscordServer.DataSource = value;
+                            comboBoxDiscordServer.ValueMember = "ID";
+                            comboBoxDiscordServer.DisplayMember = "Name";
 
-                            this.comboBoxDiscordServer.Items.Clear();
-                            this.comboBoxDiscordServer.Items.AddRange(value.ToArray<string>());
                             if (comboBoxDiscordServer.Items.Contains(oldServer))
-                                comboBoxDiscordServer.Text = oldServer;
+                                comboBoxDiscordServer.SelectedValue = oldServer;
                             updatingServerList = false;
 
-                            if (comboBoxDiscordServer.Text != oldServer)
-                                CurrentServerChanged?.Invoke(this, comboBoxDiscordServer.Text);
+                            if (comboBoxDiscordServer.SelectedValue != null)
+                            {
+                                if (oldServer != (ulong) comboBoxDiscordServer.SelectedValue)
+                                    CurrentServerChanged?.Invoke(this, (ulong)comboBoxDiscordServer?.SelectedValue);
+                            }
 
                         }
                         )
@@ -85,34 +100,35 @@ namespace DiscordAudioStream
                 }
                 else
                 {
-                    this.comboBoxDiscordServer.Items.Clear();
-                    this.comboBoxDiscordServer.Items.AddRange(value.ToArray<string>());
+                    this.comboBoxDiscordServer.DataSource = value;
                 }
             }
 
         }
 
-        ICollection<string> IDiscordConnectionView.VoiceChannels
+        ICollection<DiscordVoiceChannelInfo> IDiscordConnectionView.VoiceChannels
         {
             get
             {
-                List<string> res = new List<string>();
-                foreach (string s in comboBoxDiscordVoiceChannel.Items)
-                    res.Add(s);
-                return res;
+                return (ICollection<DiscordVoiceChannelInfo>) comboBoxDiscordVoiceChannel.DataSource;
             }
             set
             {
-                comboBoxDiscordVoiceChannel.Items.Clear();
-                if (value != null) comboBoxDiscordVoiceChannel.Items.AddRange(value.ToArray<Object>());
+                updatingChannelList = true;
+                comboBoxDiscordVoiceChannel.DataSource = value;
+                comboBoxDiscordVoiceChannel.ValueMember = "ID";
+                comboBoxDiscordVoiceChannel.DisplayMember = "CompositeName";
+                updatingChannelList = false;
             }
         }
 
-        string IDiscordConnectionView.CurrentServer
+        ulong IDiscordConnectionView.CurrentServer
         {
             get
             {
-                return comboBoxDiscordServer?.SelectedItem.ToString();
+                if (comboBoxDiscordServer.SelectedValue != null)
+                    return (ulong)comboBoxDiscordServer.SelectedValue;
+                else return 0;
             }
             set
             {
@@ -120,11 +136,13 @@ namespace DiscordAudioStream
                     comboBoxDiscordServer.SelectedItem = value;
             }
         }
-        string IDiscordConnectionView.CurrentVoiceChannel
+        ulong IDiscordConnectionView.CurrentVoiceChannel
         {
             get
             {
-                return comboBoxDiscordVoiceChannel?.SelectedItem.ToString();
+                if (comboBoxDiscordVoiceChannel.SelectedValue != null)
+                    return (ulong)comboBoxDiscordVoiceChannel.SelectedValue;
+                else return 0;
             }
             set
             {
@@ -144,6 +162,7 @@ namespace DiscordAudioStream
             }
             set
             {
+                // use BindingSource
                 comboBoxAudioDevice.ValueMember = "DeviceID";
                 comboBoxAudioDevice.DisplayMember = "DisplayName";
                 comboBoxAudioDevice.DataSource = value;
@@ -174,21 +193,22 @@ namespace DiscordAudioStream
                     new Action(
                             () =>
                             {
-                                if ((value == StatusColourCode.Red) && (toolStripStatusIcon.Image != Properties.Resources.icon_cross))  toolStripStatusIcon.Image = Properties.Resources.icon_cross;
+                                if ((value == StatusColourCode.Red) && (toolStripStatusIcon.Image != Properties.Resources.icon_cross)) toolStripStatusIcon.Image = Properties.Resources.icon_cross;
                                 else if ((value == StatusColourCode.Orange) && (toolStripStatusIcon.Image != Properties.Resources.icon_question_mark)) toolStripStatusIcon.Image = Properties.Resources.icon_question_mark;
                                 else if ((value == StatusColourCode.Green) && (toolStripStatusIcon.Image != Properties.Resources.icon_check_green)) toolStripStatusIcon.Image = Properties.Resources.icon_check_green;
                                 else if ((value == StatusColourCode.Blue) && (toolStripStatusIcon.Image != Properties.Resources.icon_streaming)) toolStripStatusIcon.Image = Properties.Resources.icon_streaming;
                             }
                             )
                     );
+                statusColourCode = value;
             }
         }
 
         public string AudioContent { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public int AudioBitrate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public event EventHandler<string> CurrentServerChanged;
-        public event EventHandler<string> CurrentVoiceChannelChanged;
+        public event EventHandler<ulong> CurrentServerChanged;
+        public event EventHandler<ulong> CurrentVoiceChannelChanged;
         public event EventHandler<string> SelectedAudioDeviceIDChanged;
         public event EventHandler<string> DiscordBotTokenChanged;
         public event EventHandler<string> AudioContentChanged;
@@ -215,10 +235,10 @@ namespace DiscordAudioStream
             {
                 if (this.peakMeterL.InvokeRequired)
                 {
-                        this.peakMeterL.Invoke(new Action(
-                            () => peakMeterL.Level = leftChannel
-                            )
-                        );
+                    this.peakMeterL.Invoke(new Action(
+                        () => peakMeterL.Level = leftChannel
+                        )
+                    );
                 }
                 else
                 {
@@ -235,43 +255,22 @@ namespace DiscordAudioStream
                 else
                 {
                     peakMeterR.Level = rightChannel;
-            }
+                }
+
+                peakL = leftChannel;
+                peakR = rightChannel;
             }
             catch (Exception e)
             {
                 System.Console.WriteLine("failed to update peak: " + e.Message);
             }
 
-            /*
-            if (this.progressBarLeft.InvokeRequired)
-            {
-                this.progressBarLeft.Invoke(new Action(
-                    () => progressBarLeft.Value = (int)(leftChannel * 100)
-                    )
-                );
-            }
-            else
-            {
-                progressBarLeft.Value = (int)(leftChannel * 100);
-            }
 
-            if (this.progressBarRight.InvokeRequired)
-            {
-                this.progressBarRight.Invoke(new Action(
-                    () => progressBarRight.Value = (int)(rightChannel * 100)
-                    )
-                );
-            }
-            else
-            {
-                progressBarRight.Value = (int)(rightChannel * 100);
-            }
-            */
         }
 
         private void comboBoxDiscordServer_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!updatingServerList) CurrentServerChanged?.Invoke(this, comboBoxDiscordServer.Text);
+            if (!updatingServerList) CurrentServerChanged?.Invoke(this, (ulong) comboBoxDiscordServer?.SelectedValue);
 
         }
 
@@ -296,7 +295,16 @@ namespace DiscordAudioStream
 
         private void comboBoxDiscordVoiceChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!updatingChannelList) CurrentVoiceChannelChanged?.Invoke(this, comboBoxDiscordVoiceChannel?.Text);
+            if (!updatingChannelList)
+            {
+                ulong newChannel = 0;
+                if (comboBoxDiscordVoiceChannel.SelectedValue != null)
+                {
+                    newChannel = (ulong)comboBoxDiscordVoiceChannel.SelectedValue;
+                }
+                CurrentVoiceChannelChanged?.Invoke(this, newChannel);
+
+            }
         }
 
 
@@ -352,6 +360,38 @@ namespace DiscordAudioStream
         {
             this.TopMost = !this.TopMost;
             floatOnTopToolStripMenuItem.Checked = this.TopMost;
+        }
+
+        private void timerRefresh_Tick(object sender, EventArgs e)
+        {
+            //float peakLNow = peakL;
+            //float peakRNow = peakR;
+            //StatusColourCode statusColourCodeNow = statusColourCode;
+            //string statusMessageNow = "";
+
+            //lock (updateLock)
+            //{
+            //    statusMessageNow = statusMessage;
+            //}
+
+            //if (statusStripMain != null)
+            //{
+            //    if (statusStripMain.Items["toolStripStatusLabelMessage"].Text != statusMessage)
+            //        statusStripMain.Items["toolStripStatusLabelMessage"].Text = statusMessage;
+            //}
+
+            //if ((statusColourCode == StatusColourCode.Red) && (toolStripStatusIcon.Image != Properties.Resources.icon_cross)) toolStripStatusIcon.Image = Properties.Resources.icon_cross;
+            //else if ((statusColourCode == StatusColourCode.Orange) && (toolStripStatusIcon.Image != Properties.Resources.icon_question_mark)) toolStripStatusIcon.Image = Properties.Resources.icon_question_mark;
+            //else if ((statusColourCode == StatusColourCode.Green) && (toolStripStatusIcon.Image != Properties.Resources.icon_check_green)) toolStripStatusIcon.Image = Properties.Resources.icon_check_green;
+            //else if ((statusColourCode == StatusColourCode.Blue) && (toolStripStatusIcon.Image != Properties.Resources.icon_streaming)) toolStripStatusIcon.Image = Properties.Resources.icon_streaming;
+               
+            //peakMeterL.Level = peakLNow;
+            //peakMeterR.Level = peakRNow;
+
+            peakMeterL.UpdatePeak();
+            peakMeterR.UpdatePeak();
+
+
         }
     }
 }
