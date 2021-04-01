@@ -1,0 +1,22 @@
+v1.0.8 (2021/04/01)
+ * Added category info to channel name
+ * Added installer
+ * Fixed an issue that was preventing connecting to homonym channels
+ * Fixed peak meter memory 
+ * misc minor UI changes
+
+v1.0.7 (2021/02/09):
+ * Added error on WASAPI mode when sample rate is not 48kHz
+ * Masked bot token
+
+v1.0.6 (2021/02/09):
+ * Added WASAPI capture
+ * Fixed a couple of potential crashes
+
+v1.0.5 (2020/11/27):
+ * Added reconnection mechanism
+ * Fixed an issue where bot would stay connected to a channel of the current server when switching to a new server
+ * misc performance changes
+
+v1.0.4 (2020/03/11):
+ * Initial release
