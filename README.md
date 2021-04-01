@@ -2,9 +2,10 @@
 A simple tool for Windows to stream audio on Discord: stream what you are playing or recording on your computer to a Discord voice channel at higher quality audio via a secondary bot connection. 
 
 # Setup
-* Get the latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases
-* DiscordAudioStream and its dependicies require at least .NET 4.7.2 (older versions could run on 4.6.1). If you are running Windows 10 up to date you should have the correct version of .Net runtime. If not or running Windows 7 install at least .NET 4.7.2 runtime or preferably the lastest .NET 4.x framework runtime available for your platform. .NET runtime installers can be found here https://dotnet.microsoft.com/download/dotnet-framework
-* Install Visual C++ 2019 x86 redist from here https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
+* Get the latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases. Get the installer (DiscordAudioStream_x.y.z_setup.exe) or the standalone package (DiscordAudioStream_x.y.z.zip)
+* The installer will propose you to install the needed third party dependencies. If you do not use the installer, make sure you have the minimum versions of .NET and Visual C++ runtimes.  
+  * DiscordAudioStream and its dependicies require at least .NET 4.7.2 (older versions could run on 4.6.1). If you are running Windows 10 up to date you should have the correct version of .Net runtime. If not or running Windows 7 install at least .NET 4.7.2 runtime or preferably the lastest .NET 4.x framework runtime available for your platform. .NET runtime installers can be found here https://dotnet.microsoft.com/download/dotnet-framework
+  * You can get Visual C++ 2019 x86 redist from here https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 * Decide which audio device input or ouput you want to stream. To stream what you are playing, the simplest method is to use a virtual audio device. I tested with virtual audio cable https://www.vb-audio.com/Cable/, but you can also use any audio device output with WASAPI loopback capture mode.
 * Get a discord bot token at https://discordapp.com/developers/applications (you can find a better in depth tutorial here on how to create a bot https://docs.stillu.cc/guides/getting_started/first-bot.html)
   * Create an application
