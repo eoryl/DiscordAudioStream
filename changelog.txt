@@ -1,3 +1,7 @@
+v1.0.9 (2021/04/10)
+ * Added master fader
+ * Fixed peak hold
+
 v1.0.8 (2021/04/01)
  * Added category info to channel name
  * Added installer
