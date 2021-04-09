@@ -36,6 +36,7 @@
             this.comboBoxDiscordServer = new System.Windows.Forms.ComboBox();
             this.labelDiscordServer = new System.Windows.Forms.Label();
             this.groupBoxLivesource = new System.Windows.Forms.GroupBox();
+            this.trackBarMasterFader = new System.Windows.Forms.TrackBar();
             this.scale1 = new DiscordAudioStream.Scale();
             this.peakMeterR = new DiscordAudioStream.PeakMeter();
             this.peakMeterL = new DiscordAudioStream.PeakMeter();
@@ -54,8 +55,10 @@
             this.toolStripStatusMessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelMessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerRefresh = new System.Windows.Forms.Timer(this.components);
+            this.toolTipMasterFaderGain = new System.Windows.Forms.ToolTip(this.components);
             this.groupBoxDiscordSettings.SuspendLayout();
             this.groupBoxLivesource.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarMasterFader)).BeginInit();
             this.menuStripMain.SuspendLayout();
             this.statusStripMain.SuspendLayout();
             this.SuspendLayout();
@@ -68,9 +71,9 @@
             this.groupBoxDiscordSettings.Controls.Add(this.labelDiscordVoiceChannel);
             this.groupBoxDiscordSettings.Controls.Add(this.comboBoxDiscordServer);
             this.groupBoxDiscordSettings.Controls.Add(this.labelDiscordServer);
-            this.groupBoxDiscordSettings.Location = new System.Drawing.Point(10, 188);
+            this.groupBoxDiscordSettings.Location = new System.Drawing.Point(11, 253);
             this.groupBoxDiscordSettings.Name = "groupBoxDiscordSettings";
-            this.groupBoxDiscordSettings.Size = new System.Drawing.Size(461, 140);
+            this.groupBoxDiscordSettings.Size = new System.Drawing.Size(459, 140);
             this.groupBoxDiscordSettings.TabIndex = 1;
             this.groupBoxDiscordSettings.TabStop = false;
             this.groupBoxDiscordSettings.Text = "Discord";
@@ -84,7 +87,7 @@
             this.comboBoxDiscordVoiceChannel.FormattingEnabled = true;
             this.comboBoxDiscordVoiceChannel.Location = new System.Drawing.Point(10, 101);
             this.comboBoxDiscordVoiceChannel.Name = "comboBoxDiscordVoiceChannel";
-            this.comboBoxDiscordVoiceChannel.Size = new System.Drawing.Size(445, 24);
+            this.comboBoxDiscordVoiceChannel.Size = new System.Drawing.Size(443, 24);
             this.comboBoxDiscordVoiceChannel.TabIndex = 3;
             this.comboBoxDiscordVoiceChannel.SelectedIndexChanged += new System.EventHandler(this.comboBoxDiscordVoiceChannel_SelectedIndexChanged);
             // 
@@ -106,7 +109,7 @@
             this.comboBoxDiscordServer.FormattingEnabled = true;
             this.comboBoxDiscordServer.Location = new System.Drawing.Point(10, 42);
             this.comboBoxDiscordServer.Name = "comboBoxDiscordServer";
-            this.comboBoxDiscordServer.Size = new System.Drawing.Size(445, 24);
+            this.comboBoxDiscordServer.Size = new System.Drawing.Size(443, 24);
             this.comboBoxDiscordServer.TabIndex = 1;
             this.comboBoxDiscordServer.SelectedIndexChanged += new System.EventHandler(this.comboBoxDiscordServer_SelectedIndexChanged);
             // 
@@ -123,6 +126,7 @@
             // 
             this.groupBoxLivesource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxLivesource.Controls.Add(this.trackBarMasterFader);
             this.groupBoxLivesource.Controls.Add(this.scale1);
             this.groupBoxLivesource.Controls.Add(this.peakMeterR);
             this.groupBoxLivesource.Controls.Add(this.peakMeterL);
@@ -130,10 +134,26 @@
             this.groupBoxLivesource.Controls.Add(this.labelAudioDevice);
             this.groupBoxLivesource.Location = new System.Drawing.Point(11, 45);
             this.groupBoxLivesource.Name = "groupBoxLivesource";
-            this.groupBoxLivesource.Size = new System.Drawing.Size(460, 137);
+            this.groupBoxLivesource.Size = new System.Drawing.Size(458, 202);
             this.groupBoxLivesource.TabIndex = 2;
             this.groupBoxLivesource.TabStop = false;
             this.groupBoxLivesource.Text = "Live source";
+            // 
+            // trackBarMasterFader
+            // 
+            this.trackBarMasterFader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBarMasterFader.LargeChange = 10;
+            this.trackBarMasterFader.Location = new System.Drawing.Point(10, 87);
+            this.trackBarMasterFader.Maximum = 0;
+            this.trackBarMasterFader.Minimum = -60;
+            this.trackBarMasterFader.Name = "trackBarMasterFader";
+            this.trackBarMasterFader.Size = new System.Drawing.Size(442, 56);
+            this.trackBarMasterFader.TabIndex = 9;
+            this.trackBarMasterFader.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.trackBarMasterFader.Scroll += new System.EventHandler(this.trackBarMasterFader_Scroll);
+            this.trackBarMasterFader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trackBarMasterFader_MouseDown);
+            this.trackBarMasterFader.MouseHover += new System.EventHandler(this.trackBarMasterFader_MouseHover);
             // 
             // scale1
             // 
@@ -146,7 +166,7 @@
             this.scale1.Min = -60;
             this.scale1.Name = "scale1";
             this.scale1.Orientation = DiscordAudioStream.Scale.ScaleOrientation.Horizontal;
-            this.scale1.Size = new System.Drawing.Size(445, 23);
+            this.scale1.Size = new System.Drawing.Size(443, 23);
             this.scale1.SmallGradation = 2;
             this.scale1.SmallGrationColor = System.Drawing.Color.LightGray;
             this.scale1.TabIndex = 8;
@@ -166,9 +186,10 @@
             this.peakMeterR.Location = new System.Drawing.Point(9, 36);
             this.peakMeterR.Name = "peakMeterR";
             this.peakMeterR.Orientation = DiscordAudioStream.PeakMeter.MeterOrientation.Horizontal;
-            this.peakMeterR.PeakColor = System.Drawing.Color.LightSteelBlue;
-            this.peakMeterR.PeakDecayTimeMS = ((long)(2000));
-            this.peakMeterR.Size = new System.Drawing.Size(445, 10);
+            this.peakMeterR.PeakColor = System.Drawing.Color.Indigo;
+            this.peakMeterR.PeakHoldTimeMS = ((long)(5000));
+            this.peakMeterR.PeakWidth = 3;
+            this.peakMeterR.Size = new System.Drawing.Size(443, 10);
             this.peakMeterR.TabIndex = 7;
             // 
             // peakMeterL
@@ -186,9 +207,10 @@
             this.peakMeterL.Location = new System.Drawing.Point(9, 24);
             this.peakMeterL.Name = "peakMeterL";
             this.peakMeterL.Orientation = DiscordAudioStream.PeakMeter.MeterOrientation.Horizontal;
-            this.peakMeterL.PeakColor = System.Drawing.Color.LightSteelBlue;
-            this.peakMeterL.PeakDecayTimeMS = ((long)(1000));
-            this.peakMeterL.Size = new System.Drawing.Size(445, 10);
+            this.peakMeterL.PeakColor = System.Drawing.Color.Indigo;
+            this.peakMeterL.PeakHoldTimeMS = ((long)(5000));
+            this.peakMeterL.PeakWidth = 3;
+            this.peakMeterL.Size = new System.Drawing.Size(443, 10);
             this.peakMeterL.TabIndex = 6;
             // 
             // comboBoxAudioDevice
@@ -197,16 +219,18 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxAudioDevice.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxAudioDevice.FormattingEnabled = true;
-            this.comboBoxAudioDevice.Location = new System.Drawing.Point(9, 97);
+            this.comboBoxAudioDevice.Location = new System.Drawing.Point(10, 166);
             this.comboBoxAudioDevice.Name = "comboBoxAudioDevice";
-            this.comboBoxAudioDevice.Size = new System.Drawing.Size(445, 24);
+            this.comboBoxAudioDevice.Size = new System.Drawing.Size(443, 24);
             this.comboBoxAudioDevice.TabIndex = 3;
             this.comboBoxAudioDevice.SelectedIndexChanged += new System.EventHandler(this.comboBoxAudioDevice_SelectedIndexChanged);
             // 
             // labelAudioDevice
             // 
+            this.labelAudioDevice.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.labelAudioDevice.AutoSize = true;
-            this.labelAudioDevice.Location = new System.Drawing.Point(6, 77);
+            this.labelAudioDevice.Location = new System.Drawing.Point(7, 146);
             this.labelAudioDevice.Name = "labelAudioDevice";
             this.labelAudioDevice.Size = new System.Drawing.Size(156, 17);
             this.labelAudioDevice.TabIndex = 2;
@@ -221,7 +245,7 @@
             this.helpToolStripMenuItem});
             this.menuStripMain.Location = new System.Drawing.Point(0, 0);
             this.menuStripMain.Name = "menuStripMain";
-            this.menuStripMain.Size = new System.Drawing.Size(484, 28);
+            this.menuStripMain.Size = new System.Drawing.Size(482, 28);
             this.menuStripMain.TabIndex = 3;
             this.menuStripMain.Text = "menuStripMain";
             this.menuStripMain.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStripMain_ItemClicked);
@@ -286,9 +310,9 @@
             this.toolStripStatusIcon,
             this.toolStripStatusMessage,
             this.toolStripStatusLabelMessage});
-            this.statusStripMain.Location = new System.Drawing.Point(0, 331);
+            this.statusStripMain.Location = new System.Drawing.Point(0, 396);
             this.statusStripMain.Name = "statusStripMain";
-            this.statusStripMain.Size = new System.Drawing.Size(484, 26);
+            this.statusStripMain.Size = new System.Drawing.Size(482, 26);
             this.statusStripMain.TabIndex = 4;
             this.statusStripMain.Text = "test";
             // 
@@ -321,7 +345,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 357);
+            this.ClientSize = new System.Drawing.Size(482, 422);
             this.Controls.Add(this.statusStripMain);
             this.Controls.Add(this.groupBoxLivesource);
             this.Controls.Add(this.groupBoxDiscordSettings);
@@ -338,6 +362,7 @@
             this.groupBoxDiscordSettings.PerformLayout();
             this.groupBoxLivesource.ResumeLayout(false);
             this.groupBoxLivesource.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarMasterFader)).EndInit();
             this.menuStripMain.ResumeLayout(false);
             this.menuStripMain.PerformLayout();
             this.statusStripMain.ResumeLayout(false);
@@ -373,6 +398,8 @@
         private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem floatOnTopToolStripMenuItem;
         private System.Windows.Forms.Timer timerRefresh;
+        private System.Windows.Forms.TrackBar trackBarMasterFader;
+        private System.Windows.Forms.ToolTip toolTipMasterFaderGain;
     }
 }
 

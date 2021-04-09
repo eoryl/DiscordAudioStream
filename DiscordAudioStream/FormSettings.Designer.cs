@@ -68,7 +68,7 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(430, 344);
+            this.buttonOK.Location = new System.Drawing.Point(430, 353);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 2;
@@ -79,7 +79,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.Location = new System.Drawing.Point(511, 344);
+            this.buttonCancel.Location = new System.Drawing.Point(511, 353);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 3;
@@ -130,9 +130,9 @@
             this.labelEncoderBirateValue.AutoSize = true;
             this.labelEncoderBirateValue.Location = new System.Drawing.Point(199, 200);
             this.labelEncoderBirateValue.Name = "labelEncoderBirateValue";
-            this.labelEncoderBirateValue.Size = new System.Drawing.Size(58, 17);
+            this.labelEncoderBirateValue.Size = new System.Drawing.Size(66, 17);
             this.labelEncoderBirateValue.TabIndex = 10;
-            this.labelEncoderBirateValue.Text = "96 kbps";
+            this.labelEncoderBirateValue.Text = "128 kbps";
             // 
             // labelContentType
             // 
@@ -304,7 +304,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.ClientSize = new System.Drawing.Size(598, 379);
+            this.ClientSize = new System.Drawing.Size(598, 388);
             this.Controls.Add(this.comboBoxCaptureAPI);
             this.Controls.Add(this.labelCaptureAPI);
             this.Controls.Add(this.labelStreamingBufferDurationValue);

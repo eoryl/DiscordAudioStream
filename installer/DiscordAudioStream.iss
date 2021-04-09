@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DiscordAudioStream"
-#define MyAppVersion "1.0.8"
+#define MyAppVersion "1.0.9"
 #define MyAppPublisher "eoryl"
 #define MyAppURL "https://github.com/eoryl/DiscordAudioStream"
 #define MyAppExeName "DiscordAudioStream.exe"
@@ -23,7 +23,7 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile="..\LICENSE"
-OutputBaseFilename={#MyAppName}_{#MyAppVersion}_setup
+OutputBaseFilename={#MyAppName}_v{#MyAppVersion}_setup
 Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -58,10 +58,10 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\redist\VC_redist.x86.exe"; Parameters: "/passive"; StatusMsg: "Installing Visual C++ runtimes"; Components: VCPP2019x86
 Filename: "{app}\redist\NDP472-KB4054531-Web.exe"; Parameters: "/passive"; StatusMsg: "Installing .NET framework"; Components: NET472
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "https://discord.com/developers/applications"; Description: "Register your bot on Discord"; Components: DISCORDAPI ; Flags: shellexec postinstall nowait skipifsilent
+Filename: "https://discord.com/developers/applications"; Description: "Register your bot on Discord"; Flags: shellexec postinstall nowait skipifsilent
 
 [Components]
 Name: "DiscordAudioStream"; Description: "DiscordAudioStream bot files"; Types: full custom compact; Flags: fixed
 Name: "VCPP2019x86"; Description: "Visual C++ 2019 x86 runtimes"; Types: full custom; Languages: english
 Name: "NET472"; Description: ".NET 4.7.2 framework (internet connection required)"; Types: full custom; Languages: english
-Name: "DISCORDAPI"; Description: "Open Discord API page to register your bot"; Types: full custom; Languages: english
+;Name: "DISCORDAPI"; Description: "Open Discord API page to register your bot"; Types: full custom; Languages: english

@@ -31,6 +31,12 @@ namespace DiscordAudioStream
         string SelectedAudioDeviceID { get; set; }
         event EventHandler<string> SelectedAudioDeviceIDChanged;
         void DisplayErrorMessage(string errorMessage);
+        float Gain { get; set; }
+        bool Mute { get; set; }
+        event EventHandler<bool> Muted;
+        event EventHandler<float> GainChanged;
+
+
 
     }
 }

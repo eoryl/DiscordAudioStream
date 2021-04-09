@@ -22,6 +22,7 @@ namespace DiscordAudioStream
         private volatile StatusColourCode statusColourCode = StatusColourCode.Red;
         private string statusMessage = "";
         private Object updateLock = new Object();
+        private bool gainUpdating = false;
 
         public FormMain()
         {
@@ -206,6 +207,38 @@ namespace DiscordAudioStream
 
         public string AudioContent { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public int AudioBitrate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public float Gain 
+        { 
+            get 
+            {
+                return (float)trackBarMasterFader.Value;
+            }
+            set 
+            { 
+                try
+                {
+                    gainUpdating = true;
+                    trackBarMasterFader.Value = (int)value;
+                    gainUpdating = false;
+                }
+                catch(Exception e)
+                {
+                }
+            }
+        }
+        public bool Mute 
+        {
+            get
+            {
+                return trackBarMasterFader.Value == trackBarMasterFader.Minimum;
+            }
+            set
+            {
+                gainUpdating = true;
+                trackBarMasterFader.Value = trackBarMasterFader.Minimum;
+                gainUpdating = false;
+            }
+        }
 
         public event EventHandler<ulong> CurrentServerChanged;
         public event EventHandler<ulong> CurrentVoiceChannelChanged;
@@ -213,7 +246,8 @@ namespace DiscordAudioStream
         public event EventHandler<string> DiscordBotTokenChanged;
         public event EventHandler<string> AudioContentChanged;
         public event EventHandler<int> AudioBitrateChanged;
-
+        public event EventHandler<bool> Muted;
+        public event EventHandler<float> GainChanged;
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -391,6 +425,50 @@ namespace DiscordAudioStream
             peakMeterL.UpdatePeak();
             peakMeterR.UpdatePeak();
 
+
+        }
+
+        private void DisplayGainTooltip()
+        {
+            string strval = "";
+            if (trackBarMasterFader.Value == trackBarMasterFader.Minimum)
+            {
+                strval = "muted";
+            }
+            else
+            {
+                strval = "" + trackBarMasterFader.Value + " dB";
+            }
+            toolTipMasterFaderGain.Show(strval, trackBarMasterFader, trackBarMasterFader.PointToClient(MousePosition), 2000);
+        }
+
+        private void trackBarMasterFader_Scroll(object sender, EventArgs e)
+        {
+            if (gainUpdating == true)
+                return;
+
+            if (trackBarMasterFader.Value == trackBarMasterFader.Minimum)
+            {
+                if (Muted != null) Muted(this, true);
+            }
+            else
+            {
+                if (Muted != null) Muted(this, false);
+            }
+            if (GainChanged != null) GainChanged(this, (float)trackBarMasterFader.Value);
+
+            DisplayGainTooltip();
+
+        }
+
+        private void trackBarMasterFader_MouseDown(object sender, MouseEventArgs e)
+        {
+            DisplayGainTooltip();
+        }
+
+        private void trackBarMasterFader_MouseHover(object sender, EventArgs e)
+        {
+            DisplayGainTooltip();
 
         }
     }

@@ -57,15 +57,26 @@ namespace DiscordAudioStreamService
         private int captureBufferDuration;
         private string currentAudioDevice = "";
         private byte[] audioVisBuffer;
-
-        // 
-        private volatile uint lastAudioBufferSentID = 0;
-        private volatile uint currentAudioBufferID = 0;
         private volatile bool initialised = false;
+
+        // audio buffers
+        byte[] txBuffer = null;
+        int txBufferUsage = 0;
+        float[] monoConversionBuffer = null;
+        int monoConversionBufferUsage = 0;
+        float[] audioProcessingBuffer = null;
+        int audioProcessingBufferUsage = 0;
+
+        // gain management
+        private object gainUpdateLock;
+        private bool muted;
+        private float gain;
+
 
         // views
         private IDiscordConnectionView _discordConnectionView;
         private IAudioCaptureView _audioCaptureView;
+
 
         //
         public AudioStreamingService() : this(null, null)
@@ -95,6 +106,10 @@ namespace DiscordAudioStreamService
 
             autoReconnectChannel = false;
 
+            gainUpdateLock = new object();
+            muted = false;
+            gain = 1.0f;
+
             DiscordConnectionView = discordConnectionView;
             AudioCaptureView = audioCaptureView;
             discordSocketClient = new DiscordSocketClient(
@@ -108,6 +123,7 @@ namespace DiscordAudioStreamService
             discordSocketClient.LoggedOut += DiscordSocketClient_LoggedOut;
             discordSocketClient.VoiceServerUpdated += DiscordSocketClient_VoiceServerUpdated;
             discordSocketClient.UserVoiceStateUpdated += DiscordSocketClient_UserVoiceStateUpdated;
+
         }
 
         public static AudioAPI ParseAudioAPI(string api)
@@ -196,6 +212,24 @@ namespace DiscordAudioStreamService
             {
                 _audioCaptureView = value;
                 if (_audioCaptureView != null) _audioCaptureView.SelectedAudioDeviceIDChanged += AudioCaptureView_SelectedDeviceChanged;
+                if (_audioCaptureView != null) _audioCaptureView.Muted += _audioCaptureView_Muted;
+                if (_audioCaptureView != null) _audioCaptureView.GainChanged += _audioCaptureView_GainChanged;
+            }
+        }
+
+        private void _audioCaptureView_GainChanged(object sender, float e)
+        {
+            lock (gainUpdateLock)
+            {
+                gain = (float) AudioTools.dBFSToLinear(e);
+            }
+        }
+
+        private void _audioCaptureView_Muted(object sender, bool e)
+        {
+            lock (gainUpdateLock)
+            {
+                muted = e;
             }
         }
 
@@ -218,7 +252,6 @@ namespace DiscordAudioStreamService
                 _discordConnectionView = value;
                 if (_discordConnectionView != null) _discordConnectionView.CurrentServerChanged += DiscordConnectionView_CurrentServerChanged;
                 if (_discordConnectionView != null) _discordConnectionView.CurrentVoiceChannelChanged += DiscordConnectionView_CurrentVoiceChannelChanged;
-
             }
         }
 
@@ -468,7 +501,7 @@ namespace DiscordAudioStreamService
                 }
                 catch (Exception e)
                 {
-                    Log("Exception disconnecting from channel");
+                    Log("Exception disconnecting from channel: " + e.Message);
                 }
 
             }
@@ -816,12 +849,11 @@ namespace DiscordAudioStreamService
                 {
                     audioIn.DataAvailable  -= Audioin_DataAvailable;
                     audioIn.StopRecording();
-
-                    UpdateAudioVisualisationAsync(new byte[] { 0,0,0,0 }, 4);
+                    ResetVisualisation();
                 }
                 catch(Exception e)
                 {
-                    Log("Exception raised while stopping capture.");
+                    Log("Exception raised while stopping capture " + e.Message);
                 }
                 finally
                 {
@@ -831,161 +863,119 @@ namespace DiscordAudioStreamService
             }
         }
 
+        private void ResetVisualisation()
+        {
+            if ((_audioCaptureView != null) && initialised)
+            {
+                AudioCaptureView.SetPeak(-144f, -144f);
+            }
+        }
+
         private void Audioin_RecordingStopped(object sender, StoppedEventArgs e)
         {
             Log("Capture stopped.");
         }
 
-        private void Audioin_DataAvailable(object sender, WaveInEventArgs e )
+        private void Audioin_DataAvailable(object sender, WaveInEventArgs e)
         {
             if (!initialised) return;
-            // parallelise in two threads encoding+tx and visualisation
-            currentAudioBufferID += 1;
-
 
             int bitdepth = this.audioIn.WaveFormat.BitsPerSample;
             int channels = this.audioIn.WaveFormat.Channels;
-            byte[] buffer = null;
-            int bufferlen = 0;
 
-            if (!((channels == 1) || (channels == 2)))
-                return;
-
-            // convert to correct bitdepth if needed
-            if (bitdepth == 16)
-            {
-                buffer = e.Buffer;
-                bufferlen = e.BytesRecorded;
-            }
-            else if ((bitdepth == 32) || (bitdepth == 24) || (bitdepth == 8))
-            {
-                short[] buffer16 = null;
-                int buffer16len = 0;
-
-                AudioBufferConverter.ConvertBitDepthTo16bit(e.Buffer, e.BytesRecorded, bitdepth, ref buffer16, ref buffer16len);
-                AudioBufferConverter.ConvertShortArrayToByte(buffer16, buffer16len, ref buffer, ref bufferlen);
-            }
-
-            if ((buffer == null) || (bufferlen <= 0)) return;
-
-            // mono to stereo if needed
             if (channels == 1)
             {
-                byte[] bufferstereo = null;
-                int bufferstereolen = 0;
-                AudioBufferConverter.MonoToStereo(buffer, bufferlen, ref bufferstereo, ref bufferstereolen);
-                buffer = bufferstereo;
-                bufferlen = bufferstereolen;
+                AudioBufferConverter.ConvertByteArrayToFloatArray(e.Buffer, e.BytesRecorded, bitdepth, ref monoConversionBuffer, ref monoConversionBufferUsage);
+                AudioBufferConverter.MonoToStereo<float>(monoConversionBuffer, monoConversionBufferUsage, ref audioProcessingBuffer, ref audioProcessingBufferUsage);
+            }
+            else if (channels == 2)
+            {
+                AudioBufferConverter.ConvertByteArrayToFloatArray(e.Buffer, e.BytesRecorded, bitdepth, ref audioProcessingBuffer, ref audioProcessingBufferUsage);
             }
 
-               
-            TransmitAudioBufferAsync(buffer, bufferlen, currentAudioBufferID);
-            UpdateAudioVisualisationAsync(buffer, bufferlen);
+            if ((audioProcessingBuffer == null) || (audioProcessingBufferUsage <= 0)) return;
+            // TODO: replace by audio processing filter chain
+            for (int i = 0; i < audioProcessingBufferUsage; i++)
+            {
+                audioProcessingBuffer[i] *= gain;
+            }
+
+            if (!muted) TransmitAudioBufferAsync(audioProcessingBuffer, audioProcessingBufferUsage);
+            UpdateAudioVisualisationAsync(audioProcessingBuffer, audioProcessingBufferUsage);
+
         }
 
-        public async void TransmitAudioBufferAsync(byte [] buffer, int byteCount, uint bufferID)
+        public async void TransmitAudioBufferAsync(float[] buffer, int sampleCount)
         {
-            if ((audioOutStream != null) && (byteCount > 0) && initialised)
+            if ((audioOutStream != null) && (sampleCount > 0) && initialised)
             {
-                lock (audioTxBuffer)
+                lock (buffer)
                 {
-                    lock (buffer)
-                    {
-                        if (audioTxBuffer.Length < byteCount)
-                            audioTxBuffer = new byte[byteCount];
-                        //System.Buffer.BlockCopy(buffer, 0, audioVisBuffer, 0, byteCount);
-                        Array.Copy(buffer, audioTxBuffer, byteCount);
-                    }
+                    AudioBufferConverter.ConvertFloatArrayToByteArray(buffer, sampleCount, 16, ref txBuffer, ref txBufferUsage);
+                }
 
-                    if (DiscordConnectionView != null)
+                if (DiscordConnectionView != null)
+                {
+                    try
+                    {
+                        DiscordConnectionView.Status = "Streaming";
+                        DiscordConnectionView.StatusColour = StatusColourCode.Blue;
+                    }
+                    catch (Exception e)
+                    {
+                        Log("Failed to update status: " + e.Message);
+                    }
+                }
+
+                if (audioOutStream != null)
+                {
+                    lock (audioOutStream)
                     {
                         try
                         {
-                            DiscordConnectionView.Status = "Streaming";
-                            DiscordConnectionView.StatusColour = StatusColourCode.Blue;
+                            audioOutStream.WriteAsync(txBuffer, 0, txBufferUsage).GetAwaiter().GetResult();
+                            audioOutStream.FlushAsync();
                         }
-                        catch(Exception e)
+                        catch (System.Exception ex)
                         {
-                            Log("Failed to update status: " + e.Message);
+                            Log("Exception raised while sending audio " + ex.Message);
                         }
-                    }
-                    //if (byteCount % 3840 != 0)
-                     //   Log($"Audio buffer is {byteCount} bytes. This will result in partial frame.");
-
-                    // lock the audioOutStreeam to prevent different threads to call 
-                    // the opus encoder encode mehtod that does not seem to be thread safe
-                    // consider replacing by a "SemaphoreQueue" type lock to make sure 
-                    // worker threads send audio packet in order of arrival
-                    if (audioOutStream != null)
-                    {
-                        lock (audioOutStream)
+                        finally
                         {
-                            try
-                            {
-                                //if (lastAudioBufferSentID != bufferID - 1)
-                                //    Debug.WriteLine($"Buffer ID out of squence by {lastAudioBufferSentID + 1 - bufferID }");
-                                audioOutStream.WriteAsync(audioTxBuffer, 0, byteCount).GetAwaiter().GetResult();
-                                lastAudioBufferSentID = bufferID;
-                                audioOutStream.FlushAsync();
-                            }
-                            catch (System.Exception ex)
-                            {
-                                Log("Exception raised while sending audio " + ex.Message);
-                            }
-                            finally
-                            {
-                            }
                         }
                     }
                 }
+                
             }
         }
 
 
-        public async void UpdateAudioVisualisationAsync(byte[] buffer, int byteCount)
+        public async void UpdateAudioVisualisationAsync(float[] buffer, int sampleCount)
         {
             if ((_audioCaptureView != null) && initialised)
             {
-                short maxL = 0, maxR = 0;
-                lock (audioVisBuffer)
+                float maxLF = 0f;
+                float maxRF = 0f;
+                lock (buffer)
                 {
-                    lock (buffer)
+                    for (int i = 0; i < sampleCount; i+=2)
                     {
-                        if (audioVisBuffer.Length < byteCount)
-                            audioVisBuffer = new byte[byteCount];
-                        //System.Buffer.BlockCopy(buffer, 0, audioVisBuffer, 0, byteCount);
-                        Array.Copy(buffer, audioVisBuffer, byteCount);
-                    }
-
-                    // prevent overflow on trailing incomplete samples
-                    if (byteCount % 4 != 0) byteCount -= byteCount % 4;
-                    for (int sampleIndex = 0; sampleIndex < byteCount; sampleIndex += 4)
-                    {
-
-                        short sampleL = (short)((audioVisBuffer[sampleIndex + 1] << 8) | audioVisBuffer[sampleIndex + 0]);
-                        // is Math.Abs implementation faster ?
-                        // workaround add 1 to negative to avoid overflow if value is -32768
-                        if (sampleL < 0) sampleL = (short)(1 - sampleL);
-                        if (sampleL > maxL) maxL = sampleL;
-
-                        short sampleR = (short)((audioVisBuffer[sampleIndex + 3] << 8) | audioVisBuffer[sampleIndex + 2]);
-                        //sampleR = Math.Abs(sampleR);
-                        if (sampleR < 0) sampleR = (short)(1 - sampleR);
-                        if (sampleR > maxR) maxR = sampleR;
-
+                        maxLF = Math.Max(maxLF, Math.Abs(buffer[i]));
+                        maxRF = Math.Max(maxRF, Math.Abs(buffer[i+1]));
                     }
                 }
-                // max samples as float 
-                float maxLF = maxL / 32767f;
-                float maxRF = maxR / 32767f;
 
                 // values in dbfs -infinity to 0 
                 float dBFSvalueL = 20.0f * (float)Math.Log10(maxLF);
                 float dBFSvalueR = 20.0f * (float)Math.Log10(maxRF);
+
+                if ((maxLF > 1.0) || (maxRF > 1.0)) 
+                    Log("Clipping");
                 AudioCaptureView.SetPeak(dBFSvalueL, dBFSvalueR);
 
             }
         }
+ 
     }
 
 }

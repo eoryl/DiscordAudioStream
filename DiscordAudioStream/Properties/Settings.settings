@@ -15,7 +15,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AudioBitrate" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">96</Value>
+      <Value Profile="(Default)">128</Value>
     </Setting>
     <Setting Name="PacketLoss" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
@@ -25,6 +25,9 @@
     </Setting>
     <Setting Name="CaptureAPI" Type="System.String" Scope="User">
       <Value Profile="(Default)">MME</Value>
+    </Setting>
+    <Setting Name="PeekHoldTime" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -30,10 +30,11 @@ namespace DiscordAudioStream
         private Color headRoomColor;
         private Color levelColor;
         private Color peakColor;
-        private long peakDecayTimeMS;
+        private long peakHoldTimeMS;
         private float peakLevel;
         private DateTime peakLevelTime;
         private bool drawPeak;
+        private int peakWidth;
 
 
         public MeterOrientation Orientation { get => orientation; set => orientation = value; }
@@ -43,10 +44,10 @@ namespace DiscordAudioStream
                 if (this.level != value)
                 {
                     this.level = value;
-                    this.UpdatePeak();
-                    //this.Invalidate();
+                    this.Invalidate();
                     //this.Refresh();
                 }
+                this.UpdatePeak();
             }
         }
         public float ClipLevel { get => clipLevel; set => clipLevel = (value > 0.0f ? 0.0f : value); }
@@ -56,9 +57,10 @@ namespace DiscordAudioStream
         public Color HeadroomLevelColor { get => headRoomColor; set => headRoomColor = value; }
         public Color LevelColor { get => levelColor; set => levelColor = value; }
         public float MaxLevel{ get => maxLevel; }
-        public long PeakDecayTimeMS { get => peakDecayTimeMS; set => peakDecayTimeMS = value; }
+        public long PeakHoldTimeMS { get => peakHoldTimeMS; set => peakHoldTimeMS = value; }
         public bool DrawPeak { get => drawPeak; set => drawPeak = value; }
         public Color PeakColor { get => peakColor; set => peakColor = value; }
+        public int PeakWidth { get => peakWidth; set => peakWidth = value; }
 
         public PeakMeter()
         {
@@ -77,9 +79,10 @@ namespace DiscordAudioStream
             headroomLevel = -18.0f;
             level = minLevel;
 
-            peakDecayTimeMS = 2000;
+            peakHoldTimeMS = 3000;
             peakLevel = minLevel;
             peakLevelTime = DateTime.UtcNow;
+            peakWidth = 4;
 
             InitializeComponent();
             SetStyle(ControlStyles.UserPaint, true);
@@ -88,20 +91,20 @@ namespace DiscordAudioStream
         public void UpdatePeak()
         {
             DateTime now = DateTime.UtcNow; 
-            if (level > peakLevel)
+            if (level >= peakLevel)
             {
                 peakLevel = level;
                 peakLevelTime = now;
             }
             else
             {
-                if ( peakLevelTime.AddMilliseconds(peakDecayTimeMS) < now)
+                if ( peakLevelTime.AddMilliseconds(peakHoldTimeMS) < now)
                 {
                     peakLevel = level;
                     peakLevelTime = now;
+                    this.Invalidate();
                 }
             }
-            this.Invalidate();
         }
 
         private int ScaleDBFsToInt(float dbFSVal, int maxIntVal)
@@ -179,7 +182,6 @@ namespace DiscordAudioStream
                     {
                         r.X = levelC;
                         r.Width = Math.Min((Math.Max(levelC, levelV) - levelC), levelM);
-
                     }
                     if (orientation == MeterOrientation.Vertical)
                     {
@@ -196,13 +198,16 @@ namespace DiscordAudioStream
                     if (orientation == MeterOrientation.Horizontal)
                     {
                         r.X = levelP;
-                        r.Width = 2;
-
+                        r.Width = peakWidth;
+                        if (r.X + r.Width > Width)
+                            r.X -= r.X + r.Width - Width;
                     }
                     if (orientation == MeterOrientation.Vertical)
                     {
                         r.Y = levelP;
-                        r.Height = 2;
+                        r.Height = peakWidth;
+                        if (r.Y + r.Height > Height)
+                            r.Y -= r.Y + r.Height - Height;
                     }
                     e.Graphics.FillRectangle(brush, r.X, r.Y, r.Width, r.Height);
                 }
