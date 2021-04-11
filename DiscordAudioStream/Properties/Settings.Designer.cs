@@ -122,12 +122,12 @@ namespace DiscordAudioStream.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5000")]
-        public int PeekHoldTime {
+        public decimal PeakHoldTime {
             get {
-                return ((int)(this["PeekHoldTime"]));
+                return ((decimal)(this["PeakHoldTime"]));
             }
             set {
-                this["PeekHoldTime"] = value;
+                this["PeakHoldTime"] = value;
             }
         }
     }

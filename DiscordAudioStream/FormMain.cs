@@ -251,6 +251,9 @@ namespace DiscordAudioStream
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            peakMeterL.PeakHoldTimeMS = Convert.ToInt64( Properties.Settings.Default.PeakHoldTime);
+            peakMeterR.PeakHoldTimeMS = Convert.ToInt64(Properties.Settings.Default.PeakHoldTime);
+
             audioStreamingService = new AudioStreamingService(this, this);
             // TODO : 
             // redo that properly with with an interface to load settings

@@ -30,22 +30,24 @@ namespace AudioProcessing
             return Math.Pow(10, (dbFS) / 20.0);
         }
 
-        // single precision requires .NET 5.0 or .NET standard 2.1 
-        //public static float linearTodBFSF(float linear)
-        //{
-        //    return (
-        //        20.0f *
-        //        MathF.Log10(
-        //            MathF.Abs(linear)
-        //            )
-        //        );
+        // single precision Math requires .NET 5.0 or .NET standard 2.1
+        // TODO: change when moving to new framework
+        public static float linearTodBFSf(float linear)
+        {
+            return (float) linearTodBFS(linear);
+            //return (
+            //    20.0f *
+            //    MathF.Log10(
+            //        MathF.Abs(linear)
+            //        )
+            //    );
+        }
 
-        //}
-
-        //public static double dBFSToLinearF(float dbFS)
-        //{
-        //    return MathF.Pow(10, (dbFS) / 20.0f);
-        //}
+        public static float dBFSToLinearf(float dbFS)
+        {
+            return (float) Math.Pow(10, (dbFS) / 20.0f);
+            //return MathF.Pow(10, (dbFS) / 20.0f);
+        }
 
 
     }

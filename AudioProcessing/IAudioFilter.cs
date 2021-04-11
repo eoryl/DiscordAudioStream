@@ -4,8 +4,14 @@ using System.Text;
 
 namespace AudioProcessing
 {
-    interface IAudioFilter : IAudioDestination
+    public interface IAudioFilter 
     {
-         int GetDelay();
+        int Init(int iInSampleRate, int iInChannels);
+        int Terminate();
+        int GetOutputChannelCount();
+        int GetOutputSampleRate();
+        int GetDelay();
+        int ProcessFrames(float[] pfFrames, int iSampleCount);
+
     }
 }

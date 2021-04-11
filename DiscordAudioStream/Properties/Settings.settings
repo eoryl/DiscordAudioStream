@@ -26,7 +26,7 @@
     <Setting Name="CaptureAPI" Type="System.String" Scope="User">
       <Value Profile="(Default)">MME</Value>
     </Setting>
-    <Setting Name="PeekHoldTime" Type="System.Int32" Scope="User">
+    <Setting Name="PeakHoldTime" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">5000</Value>
     </Setting>
   </Settings>

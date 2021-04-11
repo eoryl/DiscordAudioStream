@@ -42,6 +42,8 @@
             this.labelStreamingBufferDuration = new System.Windows.Forms.Label();
             this.labelStreamingBufferDurationValue = new System.Windows.Forms.Label();
             this.labelCaptureAPI = new System.Windows.Forms.Label();
+            this.labelPeakHold = new System.Windows.Forms.Label();
+            this.numericUpDownPeakHoldTIme = new System.Windows.Forms.NumericUpDown();
             this.comboBoxCaptureAPI = new System.Windows.Forms.ComboBox();
             this.trackBarStreamingBufferDuration = new System.Windows.Forms.TrackBar();
             this.trackBarPacketLoss = new System.Windows.Forms.TrackBar();
@@ -49,6 +51,7 @@
             this.trackBarEncoderBirate = new System.Windows.Forms.TrackBar();
             this.trackBarAudioCaptureBuffer = new System.Windows.Forms.TrackBar();
             this.textBoxDiscordBotToken = new System.Windows.Forms.TextBox();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPeakHoldTIme)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarStreamingBufferDuration)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarPacketLoss)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarEncoderBirate)).BeginInit();
@@ -68,7 +71,7 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(430, 353);
+            this.buttonOK.Location = new System.Drawing.Point(430, 378);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 2;
@@ -79,7 +82,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.Location = new System.Drawing.Point(511, 353);
+            this.buttonCancel.Location = new System.Drawing.Point(511, 378);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 3;
@@ -187,6 +190,34 @@
             this.labelCaptureAPI.Size = new System.Drawing.Size(83, 17);
             this.labelCaptureAPI.TabIndex = 20;
             this.labelCaptureAPI.Text = "Capture API";
+            // 
+            // labelPeakHold
+            // 
+            this.labelPeakHold.AutoSize = true;
+            this.labelPeakHold.Location = new System.Drawing.Point(15, 323);
+            this.labelPeakHold.Name = "labelPeakHold";
+            this.labelPeakHold.Size = new System.Drawing.Size(93, 17);
+            this.labelPeakHold.TabIndex = 22;
+            this.labelPeakHold.Text = "Peak hold ms";
+            // 
+            // numericUpDownPeakHoldTIme
+            // 
+            this.numericUpDownPeakHoldTIme.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::DiscordAudioStream.Properties.Settings.Default, "PeakHoldTime", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numericUpDownPeakHoldTIme.Increment = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownPeakHoldTIme.Location = new System.Drawing.Point(263, 323);
+            this.numericUpDownPeakHoldTIme.Maximum = new decimal(new int[] {
+            60000,
+            0,
+            0,
+            0});
+            this.numericUpDownPeakHoldTIme.Name = "numericUpDownPeakHoldTIme";
+            this.numericUpDownPeakHoldTIme.Size = new System.Drawing.Size(78, 22);
+            this.numericUpDownPeakHoldTIme.TabIndex = 23;
+            this.numericUpDownPeakHoldTIme.Value = global::DiscordAudioStream.Properties.Settings.Default.PeakHoldTime;
             // 
             // comboBoxCaptureAPI
             // 
@@ -304,7 +335,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.ClientSize = new System.Drawing.Size(598, 388);
+            this.ClientSize = new System.Drawing.Size(598, 413);
+            this.Controls.Add(this.numericUpDownPeakHoldTIme);
+            this.Controls.Add(this.labelPeakHold);
             this.Controls.Add(this.comboBoxCaptureAPI);
             this.Controls.Add(this.labelCaptureAPI);
             this.Controls.Add(this.labelStreamingBufferDurationValue);
@@ -331,6 +364,7 @@
             this.Text = "Preferences";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSettings_FormClosing);
             this.Load += new System.EventHandler(this.FormSettings_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPeakHoldTIme)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarStreamingBufferDuration)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarPacketLoss)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarEncoderBirate)).EndInit();
@@ -363,5 +397,7 @@
         private System.Windows.Forms.Label labelStreamingBufferDurationValue;
         private System.Windows.Forms.Label labelCaptureAPI;
         private System.Windows.Forms.ComboBox comboBoxCaptureAPI;
+        private System.Windows.Forms.Label labelPeakHold;
+        private System.Windows.Forms.NumericUpDown numericUpDownPeakHoldTIme;
     }
 }

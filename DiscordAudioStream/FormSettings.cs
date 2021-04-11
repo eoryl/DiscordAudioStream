@@ -41,6 +41,7 @@ namespace DiscordAudioStream
 
         private void FormSettings_Load(object sender, EventArgs e)
         {
+
         }
 
         private void linkLabelBotTokenURL_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -84,5 +85,6 @@ namespace DiscordAudioStream
         {
             textBoxDiscordBotToken.UseSystemPasswordChar = !textBoxDiscordBotToken.UseSystemPasswordChar;
         }
+
     }
 }
