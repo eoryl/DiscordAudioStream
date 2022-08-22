@@ -7,6 +7,10 @@
 #define MyAppURL "https://github.com/eoryl/DiscordAudioStream"
 #define MyAppExeName "DiscordAudioStream.exe"
 
+;CodeDependencies
+#define public Dependency_NoExampleSetup
+#include "CodeDependencies.iss"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -42,8 +46,8 @@ Source: "..\changelog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\DiscordAudioStream\Licences\*"; DestDir: "{app}\Licences"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-Source: "redist\NDP472-KB4054531-Web.exe"; DestDir: "{app}\redist"; Flags: ignoreversion; Components: NET472
-Source: "redist\VC_redist.x86.exe"; DestDir: "{app}\redist"; Flags: ignoreversion; Components: VCPP2019x86 
+;Source: "redist\NDP472-KB4054531-Web.exe"; DestDir: "{app}\redist"; Flags: ignoreversion; Components: NET472
+;Source: "redist\VC_redist.x86.exe"; DestDir: "{app}\redist"; Flags: ignoreversion; Components: VCPP2019x86 
 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -55,13 +59,22 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 [Run]
 ;Filename: "{app}\redist\VC_redist.x86.exe"; Parameters: "/q"; StatusMsg: "Installing Visual C++ runtimes"; Components: VCPP2019x86
 ;Filename: "{app}\redist\NDP472-KB4054531-Web.exe"; Parameters: "/q"; StatusMsg: "Installing .NET framework"; Components: NET472
-Filename: "{app}\redist\VC_redist.x86.exe"; Parameters: "/passive"; StatusMsg: "Installing Visual C++ runtimes"; Components: VCPP2019x86
-Filename: "{app}\redist\NDP472-KB4054531-Web.exe"; Parameters: "/passive"; StatusMsg: "Installing .NET framework"; Components: NET472
+;Filename: "{app}\redist\VC_redist.x86.exe"; Parameters: "/passive"; StatusMsg: "Installing Visual C++ runtimes"; Components: VCPP2019x86
+;Filename: "{app}\redist\NDP472-KB4054531-Web.exe"; Parameters: "/passive"; StatusMsg: "Installing .NET framework"; Components: NET472
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 Filename: "https://discord.com/developers/applications"; Description: "Register your bot on Discord"; Flags: shellexec postinstall nowait skipifsilent
 
 [Components]
 Name: "DiscordAudioStream"; Description: "DiscordAudioStream bot files"; Types: full custom compact; Flags: fixed
-Name: "VCPP2019x86"; Description: "Visual C++ 2019 x86 runtimes"; Types: full custom; Languages: english
-Name: "NET472"; Description: ".NET 4.7.2 framework (internet connection required)"; Types: full custom; Languages: english
+;Name: "VCPP2019x86"; Description: "Visual C++ 2019 x86 runtimes"; Types: full custom; Languages: english
+;Name: "NET472"; Description: ".NET 4.7.2 framework (internet connection required)"; Types: full custom; Languages: english
 ;Name: "DISCORDAPI"; Description: "Open Discord API page to register your bot"; Types: full custom; Languages: english
+
+[Code]
+function InitializeSetup: Boolean;
+begin
+  // dependencies 
+  Dependency_AddDotNet47;
+  Dependency_AddVC2015To2022;
+  Result := True;
+end;
