@@ -3,7 +3,9 @@ A simple tool for Windows to stream audio on Discord: stream what you are playin
 
 ![alt text](doc/screen-capture.gif?raw=true "capture")
 
-Video (in French) on how to use the tool https://www.youtube.com/watch?v=D8GaGncp84o
+Video (in French) on how to setup and configure the tool https://www.youtube.com/watch?v=D8GaGncp84o 
+And another one on how to use it https://www.youtube.com/watch?v=Dm1fqSWtyho
+
 
 # Setup
 * Get the latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases. Get the installer (DiscordAudioStream_x.y.z_setup.exe) or the standalone package (DiscordAudioStream_x.y.z.zip)
