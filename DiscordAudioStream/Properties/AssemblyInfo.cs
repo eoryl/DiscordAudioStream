@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Discord Audio Stream")]
-[assembly: AssemblyCopyright("Copyright ©  2021 eoryl.")]
+[assembly: AssemblyCopyright("Copyright ©  2022 eoryl")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
