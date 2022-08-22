@@ -1,6 +1,10 @@
 # DiscordAudioStream
 A simple tool for Windows to stream audio on Discord: stream what you are playing or recording on your computer to a Discord voice channel at higher quality audio via a secondary bot connection. 
 
+![alt text](doc/screen-capture.gif?raw=true "capture")
+
+Video (in French) on how to use the tool https://www.youtube.com/watch?v=D8GaGncp84o
+
 # Setup
 * Get the latest DiscordAudioStream version here https://github.com/eoryl/DiscordAudioStream/releases. Get the installer (DiscordAudioStream_x.y.z_setup.exe) or the standalone package (DiscordAudioStream_x.y.z.zip)
 * The installer will propose you to install the needed third party dependencies. If you do not use the installer, make sure you have the minimum versions of .NET and Visual C++ runtimes.  
