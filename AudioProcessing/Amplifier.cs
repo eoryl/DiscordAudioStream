@@ -9,11 +9,13 @@ namespace AudioProcessing
         private int channelCount = 2;
         private int sampleRate = 0;
         private float[] gain;
+        string name;
 
         public float[] Gain 
         { 
             get => gain; 
         }
+
 
         public Amplifier(int sampleRate, int channels, float globalGain)
         {
@@ -97,5 +99,8 @@ namespace AudioProcessing
         {
             return 0;
         }
+
+
+        public string Name { get => name; set => name = value; }
     }
 }

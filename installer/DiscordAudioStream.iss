@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DiscordAudioStream"
-#define MyAppVersion "1.0.9"
+#define MyAppVersion "1.0.10"
 #define MyAppPublisher "eoryl"
 #define MyAppURL "https://github.com/eoryl/DiscordAudioStream"
 #define MyAppExeName "DiscordAudioStream.exe"

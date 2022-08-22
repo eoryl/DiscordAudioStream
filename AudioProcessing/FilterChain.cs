@@ -6,6 +6,7 @@ namespace AudioProcessing
 {
     public class FilterChain : IAudioFilter
     {
+        private string name;
         private bool initialised ;
         private List<IAudioFilter> filters;
         public FilterChain()
@@ -80,5 +81,7 @@ namespace AudioProcessing
             initialised = false;
             return 0;
         }
+        public string Name { get => name; set => name = value; }
+
     }
 }

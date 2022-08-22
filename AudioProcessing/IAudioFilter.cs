@@ -13,5 +13,11 @@ namespace AudioProcessing
         int GetDelay();
         int ProcessFrames(float[] pfFrames, int iSampleCount);
 
+        string Name
+        {
+            get;
+            set;
+        }
+
     }
 }

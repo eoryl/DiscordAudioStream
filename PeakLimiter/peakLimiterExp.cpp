@@ -2,6 +2,8 @@
 
 #include "peakLimiter.h"
 
+// C style export to allow access from C# class
+
 extern "C" 
 {
     __declspec(dllexport) void * CreateLimiter(

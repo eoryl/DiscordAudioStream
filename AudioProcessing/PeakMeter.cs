@@ -6,6 +6,7 @@ namespace AudioProcessing
 {
     public class PeakMeter : IAudioFilter
     {
+        private string name;
         private int channelCount;
         private int sampleRate;
         private float[] peakLastPass;
@@ -123,5 +124,7 @@ namespace AudioProcessing
         {
             return 0;
         }
+        public string Name { get => name; set => name = value; }
+
     }
 }

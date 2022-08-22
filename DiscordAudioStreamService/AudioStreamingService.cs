@@ -49,14 +49,12 @@ namespace DiscordAudioStreamService
         private AudioApplication audioContent;
         private int packetLoss;
         private int streamingBufferDuration;
-        private byte[] audioTxBuffer;
 
         // audio 
         AudioAPI audioCaptureAPI = AudioAPI.MME;
         private IWaveIn audioIn = null;
         private int captureBufferDuration;
         private string currentAudioDevice = "";
-        private byte[] audioVisBuffer;
         private volatile bool initialised = false;
 
         // audio buffers
@@ -66,6 +64,9 @@ namespace DiscordAudioStreamService
         int monoConversionBufferUsage = 0;
         float[] audioProcessingBuffer = null;
         int audioProcessingBufferUsage = 0;
+
+        // audio processing
+
 
         // gain management
         private object gainUpdateLock;
@@ -101,8 +102,6 @@ namespace DiscordAudioStreamService
             packetLoss = 20;
             audioContent = AudioApplication.Music;
             // allocate buffer large enough for 100ms at 48khz 16bits stereo 
-            audioTxBuffer = new byte[19200];
-            audioVisBuffer = new byte[19200];
 
             autoReconnectChannel = false;
 
@@ -826,11 +825,8 @@ namespace DiscordAudioStreamService
                 audioIn.DataAvailable += Audioin_DataAvailable;
                 audioIn.RecordingStopped += Audioin_RecordingStopped;
 
-
-                audioTxBuffer = new byte[48 * 4 * captureBufferDuration];
-                audioVisBuffer = new byte[48 * 4 * captureBufferDuration];
-
                 audioIn.StartRecording();
+
                 Log("Capture started");
             }
             catch (Exception e)
@@ -929,12 +925,12 @@ namespace DiscordAudioStreamService
 
                 if (audioOutStream != null)
                 {
+                    Task enc = Task.CompletedTask, tx = Task.CompletedTask;
                     lock (audioOutStream)
                     {
                         try
                         {
-                            audioOutStream.WriteAsync(txBuffer, 0, txBufferUsage).GetAwaiter().GetResult();
-                            audioOutStream.FlushAsync();
+                            enc = audioOutStream.WriteAsync(txBuffer, 0, txBufferUsage);
                         }
                         catch (System.Exception ex)
                         {
@@ -944,13 +940,18 @@ namespace DiscordAudioStreamService
                         {
                         }
                     }
+                    if (enc != null)
+                    {
+                        await enc;
+                        tx = audioOutStream.FlushAsync();
+                        //if (tx != null) await tx;
+                    }
                 }
-                
             }
         }
 
 
-        public async void UpdateAudioVisualisationAsync(float[] buffer, int sampleCount)
+        public void UpdateAudioVisualisationAsync(float[] buffer, int sampleCount)
         {
             if ((_audioCaptureView != null) && initialised)
             {

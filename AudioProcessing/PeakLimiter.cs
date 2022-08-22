@@ -9,6 +9,7 @@ namespace AudioProcessing
 {
     unsafe public class PeakLimiter : IAudioFilter, IDisposable
     {
+        private string name;
         private IntPtr limiter;
         // To detect redundant calls
         private bool _disposed = false;
@@ -177,5 +178,7 @@ namespace AudioProcessing
             }
             return 0;
         }
+        public string Name { get => name; set => name = value; }
+
     }
 }
