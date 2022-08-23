@@ -199,7 +199,7 @@ namespace DiscordAudioStreamService
             AudioCaptureView = null;
             StopCapture();
 
-
+            DisconnectVoiceChannel();
             Task task = DisconnectAsync(true);
 
             if (await Task.WhenAny(task, Task.Delay(3000)) == task)
