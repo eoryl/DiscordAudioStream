@@ -921,7 +921,7 @@ namespace DiscordAudioStreamService
             // TODO: replace by audio processing filter chain
             for (int i = 0; i < audioProcessingBufferUsage; i++)
             {
-                //audioProcessingBuffer[i] *= gain;
+                audioProcessingBuffer[i] *= gain;
             }
 
             if (!muted) TransmitAudioBufferAsync(audioProcessingBuffer, audioProcessingBufferUsage);
