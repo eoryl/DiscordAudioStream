@@ -264,6 +264,8 @@ namespace DiscordAudioStream
             audioStreamingService.StreamingBufferDuration = Properties.Settings.Default.StreamingBufferDuration;
             audioStreamingService.AudioCaptureAPI = AudioStreamingService.ParseAudioAPI( Properties.Settings.Default.CaptureAPI);
             audioStreamingService.Initialize();
+
+
         }
 
         void IAudioCaptureView.SetPeak(float leftChannel, float rightChannel)

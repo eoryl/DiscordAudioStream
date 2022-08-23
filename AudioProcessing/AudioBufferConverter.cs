@@ -188,7 +188,7 @@ namespace AudioProcessing
         {
             if (bitPerSample ==8)
             {
-
+                
             }
             else if (bitPerSample == 16)
             {
@@ -201,7 +201,8 @@ namespace AudioProcessing
                 {
                     float fsample = buffer[i];
                     //short sample = (short) (fsample * short.MaxValue); 
-                    short sample = (short)((fsample < 0.0f) ? (fsample * -short.MinValue) : (fsample * short.MaxValue));
+                    //short sample = (short)((fsample < 0.0f) ? (fsample * -short.MinValue) : (fsample * short.MaxValue));
+                    short sample = (short)(Math.Round( (fsample < 0.0f) ? (fsample * -short.MinValue) : (fsample * short.MaxValue)));
                     outbuffer[i * 2] = (byte)(sample & 0xff);
                     outbuffer[(i * 2) + 1] = (byte)(sample >> 8);
                 }

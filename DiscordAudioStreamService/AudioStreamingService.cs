@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 using AudioProcessing;
 using System.Linq;
 
+//
+using System.IO;
+
 namespace DiscordAudioStreamService
 {
 
@@ -41,6 +44,12 @@ namespace DiscordAudioStreamService
         private bool disconnecting = false;
         //private ConcurrentDictionary<string, ulong> serversUIDMap = new ConcurrentDictionary<string, ulong>();
         //private ConcurrentDictionary<string, ulong> currentServerVoiceChannelsUIDMap = new ConcurrentDictionary<string, ulong>();
+
+        //
+        //FileStream fileSignalPre;
+        //FileStream fileSignalPost;
+        //
+
 
         private bool autoReconnectChannel;
 
@@ -795,6 +804,9 @@ namespace DiscordAudioStreamService
         {
             Log("Starting Capture");
 
+            //fileSignalPre = File.OpenWrite("pre.bin");
+            //fileSignalPost = File.OpenWrite("post.bin"); 
+
             if (currentAudioDevice == "")
             {
                 Log("No device selected");
@@ -839,6 +851,17 @@ namespace DiscordAudioStreamService
 
         private void StopCapture()
         {
+            //if (fileSignalPre != null)
+            //{
+            //    fileSignalPre.Close();
+            //    fileSignalPre = null;
+            //}
+            //if (fileSignalPost != null)
+            //{
+            //    fileSignalPost.Close();
+            //    fileSignalPost = null;
+            //}
+
             if (audioIn != null)
             {
                 try
@@ -879,6 +902,11 @@ namespace DiscordAudioStreamService
             int bitdepth = this.audioIn.WaveFormat.BitsPerSample;
             int channels = this.audioIn.WaveFormat.Channels;
 
+            //fileSignalPre.Write(e.Buffer, 0, e.BytesRecorded);
+            //fileSignalPre.Flush();
+            //System.Console.WriteLine("pre  " + e.BytesRecorded);
+
+
             if (channels == 1)
             {
                 AudioBufferConverter.ConvertByteArrayToFloatArray(e.Buffer, e.BytesRecorded, bitdepth, ref monoConversionBuffer, ref monoConversionBufferUsage);
@@ -893,7 +921,7 @@ namespace DiscordAudioStreamService
             // TODO: replace by audio processing filter chain
             for (int i = 0; i < audioProcessingBufferUsage; i++)
             {
-                audioProcessingBuffer[i] *= gain;
+                //audioProcessingBuffer[i] *= gain;
             }
 
             if (!muted) TransmitAudioBufferAsync(audioProcessingBuffer, audioProcessingBufferUsage);
@@ -908,6 +936,9 @@ namespace DiscordAudioStreamService
                 lock (buffer)
                 {
                     AudioBufferConverter.ConvertFloatArrayToByteArray(buffer, sampleCount, 16, ref txBuffer, ref txBufferUsage);
+                    //fileSignalPost.Write(txBuffer, 0, txBufferUsage);
+                    //fileSignalPost.Flush();
+                    //System.Console.WriteLine("post " + txBufferUsage);
                 }
 
                 if (DiscordConnectionView != null)
